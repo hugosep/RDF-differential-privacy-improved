@@ -1,0 +1,17 @@
+# Animals that were executed
+
+#added before 2016-10, 1 result
+# humans without children, 256
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX schema: <http://schema.org/>
+SELECT (COUNT (?animal) as ?entries)
+WHERE
+{
+  ?animal wdt:P31 ?tmp . # instance of some taxon (does not include human)
+  ?tmp wdt:P31 wd:Q16521 .
+  ?animal wdt:P509 ?mannerOfDeath.
+  ?mannerOfDeath wdt:P279 wd:Q8454. # some subclass of capital punishment
+}

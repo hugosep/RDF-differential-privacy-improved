@@ -1,0 +1,25 @@
+# cities with > 100000 population
+#added before 2016-10
+
+
+# Show the names of 100 cities with a population larger than 10000000 in the native languages of their countries
+
+# humans without children, 256
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX schema: <http://schema.org/>
+
+SELECT (COUNT(?city) as ?c)
+WHERE
+{
+  ?city wdt:P1082 ?population .
+  FILTER(?population>10000000)
+  ?city wdt:P31 wd:Q515;
+        wdt:P17 ?country;
+        rdfs:label ?cityLabel .
+  #        ?country wdt:P37 ?lang .
+  #?lang wdt:P424 ?langCode;
+  #      rdfs:label ?langLabel
+}

@@ -1,0 +1,6 @@
+SELECT (COUNT(?v0) as ?count) WHERE {
+  	?v0 <http://xmlns.com/foaf/age> <http://db.uwaterloo.ca/~galuc/wsdbm/AgeGroup2> . 	
+  	?v0 <http://xmlns.com/foaf/familyName> ?v2 . 	
+  	?v0 <http://schema.org/nationality> <http://db.uwaterloo.ca/~galuc/wsdbm/Country1> . 
+        ?v3 <http://purl.org/ontology/mo/artist> ?v0 . 	
+ }

@@ -1,0 +1,13 @@
+# 3 stars
+# Error in my execution
+
+# SELECT DISTINCT * WHERE {
+#  ?var1 <http://www.wikidata.org/prop/P31> / <http://www.wikidata.org/prop/statement/P31> / <http://www.wikidata.org/prop/direct/P279> )
+#   <http://www.wikidata.org/entity/Q17537576> .
+#  }
+
+SELECT (COUNT(?var1) as ?c) WHERE {
+ ?var1 <http://www.wikidata.org/prop/P31> ?tmp1 .
+ ?tmp1 <http://www.wikidata.org/prop/statement/P31> ?tmp2 .
+ ?tmp2 <http://www.wikidata.org/prop/direct/P279> <http://www.wikidata.org/entity/Q17537576> .
+ }

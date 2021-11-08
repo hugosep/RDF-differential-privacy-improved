@@ -1,0 +1,7 @@
+SELECT  ( COUNT ( DISTINCT  ?var2  ) AS  ?var3  )WHERE {
+  ?var2  <http://www.wikidata.org/prop/direct/P31> ?tmp .
+  ?var2   <http://www.wikidata.org/prop/direct/P585>  ?var4 .
+  ?var2   <http://www.wikidata.org/prop/direct/P17>  ?var1 .
+  ?tmp <http://www.wikidata.org/prop/direct/P279> <http://www.wikidata.org/entity/Q21480300> .
+  #  FILTER (  ( (  ?var4  >=  "1990-01-01"^^<http://www.w3.org/2001/XMLSchema#dateTime>  ) ) )
+}

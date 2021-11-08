@@ -1,0 +1,15 @@
+
+# Biologists with Twitter accounts, 1000 results
+# humans without children, 256
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX schema: <http://schema.org/>
+SELECT  (COUNT(?person) as ?count)
+WHERE {
+  ?person wdt:P2002 ?twitterName .
+  ?person  wdt:P106 ?occupation .
+  ?occupation wdt:P279 ?tmp1 .
+  ?tmp1 wdt:P279 wd:Q864503 . # all subclasses of biologists
+}

@@ -1,0 +1,14 @@
+# 3 stars
+# execution error at Wikidata server
+
+# SELECT (COUNT(?var3) as ?count)  WHERE {
+#   ?var3 ( <http://www.wikidata.org/prop/direct/P31> / <http://www.wikidata.org/prop/direct/P279> ) ?var1 .
+#   ?var3 ( <http://www.wikidata.org/prop/direct/P31> / <http://www.wikidata.org/prop/direct/P279> ) <http://www.wikidata.org/entity/Q879050> .
+#   }
+SELECT (COUNT(?var3) as ?count)  WHERE {
+  ?var3 <http://www.wikidata.org/prop/direct/P31> ?tmp1 .
+  ?tmp1 <http://www.wikidata.org/prop/direct/P279> ?var1 .
+  ?var3  <http://www.wikidata.org/prop/direct/P31> ?tmp2 .
+  ?tmp2 <http://www.wikidata.org/prop/direct/P279> <http://www.wikidata.org/entity/Q879050> .
+}
+

@@ -1,0 +1,15 @@
+# 2 stars
+# SELECT ( COUNT (  ?var2  ) AS  ?var3  )WHERE {
+#   ?var2 ( <http://www.wikidata.org/prop/direct/P31> / <http://www.wikidata.org/prop/direct/P279> *) <http://www.wikidata.org/entity/Q21480300> ;
+#        <http://www.wikidata.org/prop/direct/P585>  ?var4 ; <http://www.wikidata.org/prop/direct/P17>  ?var1 .
+#  # FILTER (  ( (  ?var4  >=  "1990-01-01"^^<http://www.w3.org/2001/XMLSchema#dateTime>  ) ) )
+#
+
+# internal server error              }
+SELECT ( COUNT (  ?var2  ) AS  ?var3  )WHERE {
+  ?var2 <http://www.wikidata.org/prop/direct/P31> ?tmp1 .
+  ?tmp1 <http://www.wikidata.org/prop/direct/P279>  <http://www.wikidata.org/entity/Q21480300> ;
+       # <http://www.wikidata.org/prop/direct/P585>  ?var4 ;
+       <http://www.wikidata.org/prop/direct/P17>  ?var1 .
+ # FILTER (  ( (  ?var4  >=  "1990-01-01"^^<http://www.w3.org/2001/XMLSchema#dateTime>  ) ) )
+               }

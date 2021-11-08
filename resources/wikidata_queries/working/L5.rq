@@ -1,0 +1,15 @@
+# Most cited female authors, TLE
+# humans without children, 256
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX schema: <http://schema.org/>
+SELECT (COUNT(?publication) AS ?count)
+WHERE
+{
+    ?item wdt:P2860 ?publication . #citations
+    ?publication wdt:P50 ?author . #authors
+    ?author wdt:P21 wd:Q6581072. #females
+
+} 

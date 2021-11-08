@@ -1,0 +1,5 @@
+SELECT (COUNT(?v0) as ?count) WHERE {
+  	?v0 <http://schema.org/jobTitle> ?v1 .
+        ?v0 <http://schema.org/nationality> ?v3 . 
+  	<http://db.uwaterloo.ca/~galuc/wsdbm/City75> <http://www.geonames.org/ontology#parentCountry> ?v3 . 
+ }

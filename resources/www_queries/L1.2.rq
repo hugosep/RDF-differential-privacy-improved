@@ -1,0 +1,3 @@
+SELECT (COUNT(?v2) as ?count) WHERE {
+  	?v2 <http://schema.org/caption> ?v3 . 	
+ }

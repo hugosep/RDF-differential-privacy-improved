@@ -1,0 +1,16 @@
+# 2 stars
+# humans without children, 256
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX schema: <http://schema.org/>
+PREFIX wdno: <http://www.wikidata.org/prop/novalue/>
+PREFIX p: <http://www.wikidata.org/prop/>
+SELECT (COUNT(?human) as ?C)
+WHERE
+{
+  ?human wdt:P31 wd:Q5 .         #find humans
+  ?human p:P40 ?childStatement . #with at least one P40 (child) statement
+  ?childStatement rdf:type wdno:P40 .   #where the P40 (child) statement is defined to be "no value"
+}

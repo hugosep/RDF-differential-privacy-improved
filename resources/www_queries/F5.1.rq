@@ -1,0 +1,5 @@
+SELECT (COUNT(?v0) as ?count) WHERE {
+  	?v0 <http://purl.org/goodrelations/includes> ?v1 . 	
+  	?v0 <http://purl.org/goodrelations/price> ?v3 . 	
+  	?v0 <http://purl.org/goodrelations/validThrough> ?v4 . 	
+  }

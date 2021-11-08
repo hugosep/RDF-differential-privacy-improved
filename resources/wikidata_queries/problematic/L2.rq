@@ -1,0 +1,16 @@
+# TLE
+# The number of statements by DOI
+# humans without children, 256
+PREFIX pr: <http://www.wikidata.org/prop/reference/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+SELECT (COUNT(?statement) as ?c)
+{
+  # ?entry ?p ?statement .
+  ?statement prov:wasDerivedFrom ?tmp1 .
+  ?tmp1 pr:P248 ?tmp2 .
+  ?tmp2 wdt:P356 ?doi .
+}

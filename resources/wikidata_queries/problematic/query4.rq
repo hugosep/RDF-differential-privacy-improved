@@ -1,0 +1,11 @@
+SELECT ( COUNT ( ?var6  ) as ?c)  WHERE   
+{
+
+    ?var8  <http://www.wikidata.org/prop/direct/P1416>  <http://www.wikidata.org/entity/Q24283660>   .
+#    ?var5 ( <http://www.wikidata.org/prop/direct/P50> | <http://www.wikidata.org/prop/direct/P2093> ) ?var7 .
+    ?var5  <http://www.wikidata.org/prop/direct/P50>  ?var8 .
+    ?var6  <http://www.wikidata.org/prop/direct/P2860>  ?var5 .
+    ?var5  <http://www.wikidata.org/prop/direct/P577>  ?var9 .
+    ?var8  <http://www.w3.org/2000/01/rdf-schema#label>  ?var4Label .
+    FILTER (    ( (  LANG (  ?var4Label  )  =  "en" ) ) ) 
+}

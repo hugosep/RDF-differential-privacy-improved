@@ -1,0 +1,3 @@
+SELECT (COUNT(?v0) as ?count) WHERE {
+	<http://db.uwaterloo.ca/~galuc/wsdbm/Retailer9247> <http://purl.org/goodrelations/offers> ?v0 . 	
+}

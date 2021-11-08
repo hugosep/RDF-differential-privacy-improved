@@ -1,0 +1,19 @@
+SELECT (COUNT ( ?var7  )  AS  ?c  )  WHERE   
+{   
+#  { ?var8  <http://www.wikidata.org/prop/direct/P108>  <http://www.wikidata.org/entity/Q24283660> .   }
+#    UNION
+#   {     ?var8  <http://www.wikidata.org/prop/direct/P1416>  <http://www.wikidata.org/entity/Q24283660> .   }
+#    UNION
+#   {     ?var8  <http://www.wikidata.org/prop/direct/P1416>  ?var9 .
+#         ?var9  <http://www.wikidata.org/prop/direct/P361>  <http://www.wikidata.org/entity/Q24283660> .
+#   }
+#    BIND (  STR (  YEAR (  ?var10  )  )  AS  ?var1 ).
+    ?var5 <http://www.wikidata.org/prop/direct/P2093> ?var7 .
+    ?var5  <http://www.wikidata.org/prop/direct/P31>  <http://www.wikidata.org/entity/Q13442814> .
+    ?var5  <http://www.wikidata.org/prop/direct/P50>  ?var8 .
+    ?var5  <http://www.wikidata.org/prop/direct/P1104>  ?var6 .
+    ?var5  <http://www.wikidata.org/prop/direct/P577>  ?var10 .
+    ?var8  <http://www.w3.org/2000/01/rdf-schema#label>  ?var4Label .
+    FILTER (    ( (  LANG (  ?var4Label  )  =  "en" ) ) ) 
+}  
+

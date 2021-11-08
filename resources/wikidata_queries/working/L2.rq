@@ -1,0 +1,8 @@
+# 2 stars
+SELECT (COUNT(?var1) as ?c)  WHERE {
+  # ?var1  <http://www.wikidata.org/prop/direct/P106>  <http://www.wikidata.org/entity/Q11900058> .
+  # ?var1  <http://www.wikidata.org/prop/direct/P27>  <http://www.wikidata.org/entity/Q183> .
+  # ?var1  <http://www.wikidata.org/prop/direct/P569>  ?var3 .
+  ?var1  <http://www.wikidata.org/prop/direct/P937> ?tmp1 .
+  ?tmp1 <http://www.wikidata.org/prop/direct/P30> <http://www.wikidata.org/entity/Q15> .
+  }

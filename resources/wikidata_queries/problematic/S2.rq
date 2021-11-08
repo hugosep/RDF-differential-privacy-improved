@@ -1,0 +1,13 @@
+# Species of mosquitoes
+# added 2017-06, 4709 results, depende de P171*
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX schema: <http://schema.org/>
+SELECT (COUNT(?item) as ?count) WHERE {
+  ?item wdt:P31 wd:Q16521 ;
+        wdt:P105 wd:Q7432 ;
+        wdt:P171* wd:Q7367 ;
+        wdt:P225 ?taxonname .
+}

@@ -1,0 +1,4 @@
+SELECT (COUNT(?v1) as ?count) WHERE {
+  	?v0 <http://schema.org/jobTitle> ?v1 .
+  	?v0 <http://schema.org/nationality> ?v3 . 
+ } ORDER BY ?v1  DESC (?count) LIMIT 1 

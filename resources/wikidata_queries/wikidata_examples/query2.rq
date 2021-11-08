@@ -1,0 +1,1 @@
+SELECT ( COUNT (?var4) AS  ?var2  ) WHERE { ?var4  <http://www.wikidata.org/prop/direct/P279>  ?var1 . ?var4  <http://www.wikidata.org/prop/direct/P901>  ?var5 . }

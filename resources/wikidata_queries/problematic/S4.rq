@@ -1,0 +1,18 @@
+# Mountains over 8000 elevation
+
+# elevation above sea level (P2044)
+# Filter muy bueno
+#added before 2016-10
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX schema: <http://schema.org/>
+
+SELECT (COUNT(?subj) as ?c)
+WHERE
+{
+  ?subj wdt:P2044 ?elev .
+  ?subj wdt:P625 ?coord 
+   filter(?elev > 5000) 
+}

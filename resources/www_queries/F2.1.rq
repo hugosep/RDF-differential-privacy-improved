@@ -1,0 +1,4 @@
+SELECT (COUNT(?v1) as ?count) WHERE {
+	?v1 <http://schema.org/url> ?v6 .	
+	?v1 <http://db.uwaterloo.ca/~galuc/wsdbm/hits> ?v7 .	
+}

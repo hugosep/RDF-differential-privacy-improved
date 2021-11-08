@@ -1,0 +1,1 @@
+SELECT DISTINCT( COUNT ( ?var1  ) AS  ?var2  )WHERE {  ?var1  <http://www.wikidata.org/prop/direct/P84>  ?var3 . }
