@@ -30,7 +30,7 @@ In Maven:
 - apache.logging.log4j.core:2.14.1
 
 In _lib_:
-- SymJava-1.1.2 [Github](https://github.com/yuemingl/SymJava)
+- SymJava-1.1.2 ([Github](https://github.com/yuemingl/SymJava))
 - matheclipse-core ([Github](https://github.com/axkr/symja_android_library), compiled 9-nov-2021)
 
 ### Next, see the README in Run folder:
