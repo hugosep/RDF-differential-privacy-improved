@@ -20,5 +20,22 @@ This previous implementation was created for the paper [Differential Privacy and
 ## How to use
 
 ### First, install/add the next dependencies:
+In Maven:
+- google.code.gson:2.8.9
+- rdfhdt.hdt.jena:2.1.2
+- rdfhdt.hdt.java.core:2.1.2
+- apache.jena.core:3.7.0
+- google.guava:2.8.9
+- apache.jena.arq:3.7.0
+- apache.logging.log4j.core:2.14.1
 
-Next, see the README in Run folder.
+In _lib_:
+- SymJava-1.1.2 [Github](https://github.com/yuemingl/SymJava)
+- matheclipse-core ([Github](https://github.com/axkr/symja_android_library), compiled 9-nov-2021)
+
+### Next, see the README in Run folder:
+- Generate Count Queries: generate queries in the _resources_ folder.
+- RunQueriesParallel: run queries with asynchronous methods.
+  - RunSparqlQuery: run SPARQL query and print the result.
+- RunSymbolic: process the queries for differential privacy.
+- RunQuery: run SPARQL query, write the result in an output file.
