@@ -1,0 +1,1 @@
+{   "query": "resources/wikidata_queries/working/S1.rq",   "epsilon": 0.1,   "privateResult": [     61.39330162180774   ],   "sensitivity": 1.0,   "result": [     49   ],   "mapMostFreqValue": {},   "mapMostFreqValueStar": {},   "maxK": 0,   "scale": 20.0,   "elasticStability": "x",   "graphSize": 109,   "starQuery": true }
