@@ -29,13 +29,13 @@ In Maven:
 - apache.jena.arq:3.7.0
 - apache.logging.log4j.core:2.14.1
 
-In _lib_:
+In _lib_ folder:
 - SymJava-1.1.2 ([Github](https://github.com/yuemingl/SymJava))
 - matheclipse-core ([Github](https://github.com/axkr/symja_android_library), compiled 9-nov-2021)
 
 ### Next, see the README in Run folder:
 - Generate Count Queries: generate queries in the _resources_ folder.
 - RunQueriesParallel: run queries with asynchronous methods.
-  - RunSparqlQuery: run SPARQL query and print the result.
+- RunSparqlQuery: run SPARQL query and print the result.
 - RunSymbolic: process the queries for differential privacy.
 - RunQuery: run SPARQL query, write the result in an output file.
