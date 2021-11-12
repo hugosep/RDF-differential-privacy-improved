@@ -16,8 +16,6 @@ import java.util.concurrent.ExecutionException;
 /**
  *
  * @author cbuil
- * @description
- * @last_editor
  */
 
 public interface DataSource {
@@ -30,7 +28,7 @@ public interface DataSource {
 
     int executeCountQuery(String queryString);
 
-    long getGraphSizeTriples(List<List<String>> triplePatternsCount);
+    Long getGraphSizeTriples(List<List<String>> triplePatternsCount);
 
     void setMostFreqValueMaps(
             Map<String, List<TriplePath>> starQueriesMap,

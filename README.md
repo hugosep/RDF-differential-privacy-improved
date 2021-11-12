@@ -6,8 +6,8 @@ This previous implementation was created for the paper [Differential Privacy and
 
 ## What is improved?
 
-- [ ] Java styleguide standardization
-- [ ] A cleaner code
+- [x] Java styleguide standardization (Google Java Format)
+- [x] A clean code
 - [ ] Theoretical optimization for the function:
   - Let P(k) be a polynomial and _k_ in _\[0, graphSize\]_, **max Eˆ(-beta\*k)\*P(k)**
     - Improved calculating the derivatives for max and min values of the function, minimizing the iterations for maximize as a function of k.

@@ -4,20 +4,23 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Node_URI;
 import org.apache.jena.graph.Node_Variable;
 import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Helper {
 
     public static List<String> getJoinVariables(List<TriplePath> starQueryLeft,
             List<TriplePath> starQueryRight) {
 
-        List<String> rightVariables = new ArrayList<String>();
-        List<String> joinVariables = new ArrayList<String>();
+        List<String> rightVariables = new ArrayList<>();
+        List<String> joinVariables = new ArrayList<>();
 
         for (TriplePath triplePath : starQueryRight) {
 
@@ -115,7 +118,7 @@ public class Helper {
 
     public static String getStarQueryString(List<TriplePath> starQuery) {
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         for (TriplePath triplePath : starQuery) {
             String subject = "";
@@ -229,5 +232,34 @@ public class Helper {
             ancestors.add(object);
             return false;
         }
+    }
+
+    public String generalizeQuery(String strQuery) {
+        Query query = QueryFactory.create(strQuery);
+        String BGP = query.getQueryPattern().toString();
+        Pattern variable = Pattern.compile("\\?\\w+", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = variable.matcher(BGP);
+        HashSet<String> setVariables = new HashSet<>();
+        HashMap<String, String> mapVarGeneric = new HashMap<>();
+
+        while (matcher.find()) {
+            setVariables.add(matcher.group());
+        }
+
+        int i = 0;
+        String genericVar;
+
+        for(String var : setVariables) {
+            genericVar = "var" + i;
+            mapVarGeneric.put(var, genericVar);
+            i++;
+        }
+
+        String newStrQuery = "";
+
+        for(String var : setVariables) {
+            newStrQuery = strQuery.replaceAll(var, mapVarGeneric.get(var));
+        }
+        return(newStrQuery);
     }
 }

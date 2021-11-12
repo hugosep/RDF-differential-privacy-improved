@@ -149,7 +149,7 @@ public class HDTDataSource implements DataSource {
         return countResult;
     }
 
-    @Override public long getGraphSizeTriples(List<List<String>> triplePatternsCount) {
+    @Override public Long getGraphSizeTriples(List<List<String>> triplePatternsCount) {
         long count = 0;
 
         for (List<String> star : triplePatternsCount) {
