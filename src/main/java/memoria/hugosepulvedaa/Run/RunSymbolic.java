@@ -40,11 +40,12 @@ public class RunSymbolic {
     private static String outputFile;
     private static String endpoint;
     private static boolean evaluation = false;
-    private static DataSource dataSource;
     private static boolean is_endpoint = false;
 
     public static void main(String[] args)
             throws IOException, CloneNotSupportedException, ExecutionException {
+
+        DataSource dataSource;
 
         parseInput(args);
 
@@ -267,7 +268,7 @@ public class RunSymbolic {
     private static void writeAnalysisResult(
             double scale, String queryFile, double EPSILON,
             boolean evaluation, int countQueryResult, Expr elasticStability,
-            long graphSize, boolean starQuery, DataSource hdtDataSource,
+            long graphSize, boolean starQuery, DataSource dataSource,
             Sensitivity smoothSensitivity, String outputFile)
             throws IOException {
 
@@ -313,10 +314,8 @@ public class RunSymbolic {
                 elasticStability,
                 graphSize,
                 starQuery,
-                hdtDataSource.getMapMostFreqValue(),
-                hdtDataSource.getMapMostFreqValueStar());
-
-        System.out.println("Result:" + result);
+                dataSource.getMapMostFreqValue(),
+                dataSource.getMapMostFreqValueStar());
 
         String resultsBuffer = result.toString().replace('\n', ' ') + "\n";
 

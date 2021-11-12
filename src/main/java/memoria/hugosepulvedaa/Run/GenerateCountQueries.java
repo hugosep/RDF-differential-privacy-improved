@@ -65,7 +65,7 @@ public class GenerateCountQueries {
                         .next();
                 System.out.println("queryString: " + queryString);
 
-                runQueryGeneration(queryString, outputDir, queryString);
+                runQueryGeneration(queryString, outputDir);
 
             } else if (Files.isDirectory(queryLocation)) {
                 System.out.println("not queryString");
@@ -85,7 +85,7 @@ public class GenerateCountQueries {
                             .next();
 
                     logger.info("Next query path: " + nextQuery);
-                    runQueryGeneration(queryString, outputDir, nextQuery.toString());
+                    runQueryGeneration(queryString, outputDir);
                 }
             }
 
@@ -106,7 +106,7 @@ public class GenerateCountQueries {
     }
 
     private static boolean varsIn(Triple tripleKey, Triple triple) {
-        ArrayList<String> vars = new ArrayList<String>();
+        ArrayList<String> vars = new ArrayList<>();
 
         if (tripleKey.getSubject().isVariable()) {
             vars.add(tripleKey.getSubject().getName());
@@ -138,10 +138,9 @@ public class GenerateCountQueries {
         return false;
     }
 
-    private static void runQueryGeneration(String queryString, String outputDir,
-            String queryFile) throws IOException {
+    private static void runQueryGeneration(String queryString, String outputDir) throws IOException {
 
-        ArrayList<LinkedList<Triple>> relatedTriplesList = new ArrayList<LinkedList<Triple>>();
+        ArrayList<LinkedList<Triple>> relatedTriplesList = new ArrayList<>();
         Query q = QueryFactory.create(queryString);
         ElementGroup queryPattern = (ElementGroup) q.getQueryPattern();
         List<Element> elementList = queryPattern.getElements();
@@ -160,7 +159,7 @@ public class GenerateCountQueries {
 
                     if (relatedTriplesList.isEmpty()) {
 
-                        triplesAdjList = new LinkedList<Triple>();
+                        triplesAdjList = new LinkedList<>();
                         triplesAdjList.add(triple);
                         relatedTriplesList.add(triplesAdjList);
 
@@ -178,7 +177,7 @@ public class GenerateCountQueries {
                         }
 
                         if (!isIn) {
-                            triplesAdjList = new LinkedList<Triple>();
+                            triplesAdjList = new LinkedList<>();
                             triplesAdjList.add(triple);
                             relatedTriplesList.add(triplesAdjList);
                         }
@@ -217,7 +216,7 @@ public class GenerateCountQueries {
         for (Var var : q.getProjectVars()) {
 
             String varStr = var.getName();
-            StringBuffer newQueryString = new StringBuffer("SELECT (COUNT(?"
+            StringBuilder newQueryString = new StringBuilder("SELECT (COUNT(?"
                     + varStr + ") as " + "?count_" + varStr + ") WHERE {\n");
 
             for (LinkedList<Triple> tripleList : relatedTriplesList) {
