@@ -21,28 +21,23 @@ public class Sensitivity {
         this.s = s;
     }
 
-    public Expr getS()
-    {
+    public Expr getS() {
         return s;
     }
 
-    public double getSensitivity()
-    {
+    public double getSensitivity() {
         return sensitivity;
     }
-    
-    public void setSensitivity(double newSensitivity)
-    {
+
+    public void setSensitivity(double newSensitivity) {
         this.sensitivity = newSensitivity;
     }
-    
-    public int getMaxK()
-    {
+
+    public int getMaxK() {
         return maxK;
     }
-    
-    public void setMaxK(int maxK)
-    {
+
+    public void setMaxK(int maxK) {
         this.maxK = maxK;
     }
 }

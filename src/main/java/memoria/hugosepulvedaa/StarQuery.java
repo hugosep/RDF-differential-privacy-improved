@@ -13,7 +13,7 @@ public class StarQuery implements Comparable<StarQuery> {
     private final List<TriplePath> triples;
 
     // the smoothed sensitivity of the star query
-    //private Sensitivity querySentitivity;
+    // private Sensitivity querySentitivity;
 
     // elastic stability is the formula by which we calculate the sensitivity,
     // only appears when there are more than two star queries
@@ -72,39 +72,26 @@ public class StarQuery implements Comparable<StarQuery> {
             String subject = "";
 
             if (triplePath.asTriple().getMatchSubject() instanceof Node_URI) {
-                subject = "<" + triplePath.asTriple().getMatchSubject().getURI()
-                        + ">";
+                subject = "<" + triplePath.asTriple().getMatchSubject().getURI() + ">";
 
-            } else if (triplePath
-                    .asTriple()
-                    .getMatchSubject() instanceof Node_Variable) {
-                subject = "?"
-                        + triplePath.asTriple().getMatchSubject().getName();
+            } else if (triplePath.asTriple().getMatchSubject() instanceof Node_Variable) {
+                subject = "?" + triplePath.asTriple().getMatchSubject().getName();
             }
 
             String pred = "";
 
             if (triplePath.asTriple().getMatchPredicate() instanceof Node_URI) {
 
-                pred = "<" + triplePath.asTriple().getMatchPredicate().getURI()
-                        + ">";
-            } else if (triplePath
-                    .asTriple()
-                    .getMatchPredicate() instanceof Node_Variable) {
-                pred = "?"
-                        + triplePath.asTriple().getMatchPredicate().getName();
+                pred = "<" + triplePath.asTriple().getMatchPredicate().getURI() + ">";
+            } else if (triplePath.asTriple().getMatchPredicate() instanceof Node_Variable) {
+                pred = "?" + triplePath.asTriple().getMatchPredicate().getName();
             }
 
             String object = "";
 
-            if (triplePath
-                    .asTriple()
-                    .getMatchObject() instanceof Node_URI) {
-                object = "<" + triplePath.asTriple().getMatchObject().getURI()
-                        + ">";
-            } else if (triplePath
-                    .asTriple()
-                    .getMatchObject() instanceof Node_Variable) {
+            if (triplePath.asTriple().getMatchObject() instanceof Node_URI) {
+                object = "<" + triplePath.asTriple().getMatchObject().getURI() + ">";
+            } else if (triplePath.asTriple().getMatchObject() instanceof Node_Variable) {
                 object = "?" + triplePath.asTriple().getMatchObject().getName();
             }
 
@@ -115,8 +102,7 @@ public class StarQuery implements Comparable<StarQuery> {
         return result.toString();
     }
 
-    public List<TriplePath> getTriples()
-    {
+    public List<TriplePath> getTriples() {
         return triples;
     }
 
@@ -136,7 +122,8 @@ public class StarQuery implements Comparable<StarQuery> {
         this.mpValue = mpValue;
     }
 
-    @Override public int compareTo(StarQuery o) {
+    @Override
+    public int compareTo(StarQuery o) {
         List<String> joinVariables = o.getVariables();
         joinVariables.retainAll(this.getVariables());
         return joinVariables.size();

@@ -28,35 +28,34 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- *
- * @author cbuil
- */
+/** @author cbuil */
 public class RunQueriesParallel {
 
-    private static final Logger logger = LogManager
-            .getLogger(memoria.hugosepulvedaa.Run.RunQueriesParallel.class.getName());
+    private static final Logger logger =
+            LogManager.getLogger(memoria.hugosepulvedaa.Run.RunQueriesParallel.class.getName());
 
     private static String queryFilesDir = "";
     private static String dataFile = "";
     private static String outputFile = "";
     private static String cores = "";
     private static boolean evaluation = false;
-    
+
     private static HDT datasource;
     private static NodeDictionary dictionary;
     private static HDTGraph graph;
     private static Model triples;
 
-    public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
+    public static void main(String[] args)
+            throws IOException, InterruptedException, ExecutionException {
         parseInput(args);
 
         List<String> queryFiles;
 
         try (Stream<Path> paths = Files.walk(Paths.get(queryFilesDir))) {
-            queryFiles = paths
-                    .filter(Files::isRegularFile).map(Path::toString)
-                    .collect(Collectors.toList());
+            queryFiles =
+                    paths.filter(Files::isRegularFile)
+                            .map(Path::toString)
+                            .collect(Collectors.toList());
         }
 
         datasource = HDTManager.mapIndexedHDT(dataFile, null);
@@ -67,9 +66,8 @@ public class RunQueriesParallel {
 
         ArrayList<RunSparqlQuery> tasks = new ArrayList();
 
-        for(String queryFile : queryFiles) {
-            String queryString = new Scanner(new File(queryFile))
-                    .useDelimiter("\\Z").next();
+        for (String queryFile : queryFiles) {
+            String queryString = new Scanner(new File(queryFile)).useDelimiter("\\Z").next();
             tasks.add(new RunSparqlQuery(triples, queryString, queryFile));
         }
 
@@ -95,8 +93,7 @@ public class RunQueriesParallel {
                 StandardOpenOption.APPEND);
     }
 
-    private static void parseInput(String[] args)
-            throws IOException {
+    private static void parseInput(String[] args) throws IOException {
         // create Options object
         Options options = new Options();
 
@@ -112,8 +109,8 @@ public class RunQueriesParallel {
 
             if (cmd.hasOption("f")) {
                 queryFilesDir = cmd.getOptionValue("f");
-//                queryString = new Scanner(new File(queryFile))
-//                        .useDelimiter("\\Z").next();
+                //                queryString = new Scanner(new File(queryFile))
+                //                        .useDelimiter("\\Z").next();
                 // transform into Jena Query object
             } else {
                 logger.info("Missing SPARQL query file");

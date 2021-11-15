@@ -16,8 +16,8 @@ import java.util.regex.Pattern;
 
 public class Helper {
 
-    public static List<String> getJoinVariables(List<TriplePath> starQueryLeft,
-            List<TriplePath> starQueryRight) {
+    public static List<String> getJoinVariables(
+            List<TriplePath> starQueryLeft, List<TriplePath> starQueryRight) {
 
         List<String> rightVariables = new ArrayList<>();
         List<String> joinVariables = new ArrayList<>();
@@ -47,7 +47,7 @@ public class Helper {
      */
     public static Map<String, List<TriplePath>> getStarPatterns(Query query) {
 
-        List<Element> elements = ((ElementGroup)query.getQueryPattern()).getElements();
+        List<Element> elements = ((ElementGroup) query.getQueryPattern()).getElements();
         List<TriplePath> tripleList;
         Map<String, List<TriplePath>> starMap = new HashMap<>();
 
@@ -91,7 +91,7 @@ public class Helper {
      */
     public static boolean isStarQuery(Query query) {
 
-        List<Element> elements = ((ElementGroup)query.getQueryPattern()).getElements();
+        List<Element> elements = ((ElementGroup) query.getQueryPattern()).getElements();
 
         ElementPathBlock element = (ElementPathBlock) elements.get(0);
         List<TriplePath> triplePath = element.getPattern().getList();
@@ -197,7 +197,6 @@ public class Helper {
 
         List<String> aux = triplePartExtractor(triplePath);
         String result = aux.get(0) + " " + aux.get(1) + " " + aux.get(2);
-
         return result;
     }
 
@@ -249,7 +248,7 @@ public class Helper {
         int i = 0;
         String genericVar;
 
-        for(String var : setVariables) {
+        for (String var : setVariables) {
             genericVar = "var" + i;
             mapVarGeneric.put(var, genericVar);
             i++;
@@ -257,9 +256,9 @@ public class Helper {
 
         String newStrQuery = "";
 
-        for(String var : setVariables) {
+        for (String var : setVariables) {
             newStrQuery = strQuery.replaceAll(var, mapVarGeneric.get(var));
         }
-        return(newStrQuery);
+        return (newStrQuery);
     }
 }

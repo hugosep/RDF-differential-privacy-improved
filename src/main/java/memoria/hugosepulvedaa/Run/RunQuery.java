@@ -18,8 +18,7 @@ import java.util.Scanner;
 
 public class RunQuery {
 
-    private static final Logger logger = LogManager
-            .getLogger(RunQuery.class.getName());
+    private static final Logger logger = LogManager.getLogger(RunQuery.class.getName());
 
     static String queryString;
     static String queryFile;
@@ -38,8 +37,8 @@ public class RunQuery {
         options.addOption("e", "endpoint", true, "endpoint address");
 
         SecureRandom sc = new SecureRandom();
-        
-        for(int i = 0; i < 100; i++) {
+
+        for (int i = 0; i < 100; i++) {
             logger.info("secure random: " + sc.nextDouble());
         }
 
@@ -74,7 +73,7 @@ public class RunQuery {
 
         try {
 
-            if(cmd.hasOption("f")) {
+            if (cmd.hasOption("f")) {
                 System.out.println("Endpoint");
                 endpointDataSource = new EndpointDataSource(endpoint);
             } else {
@@ -86,15 +85,14 @@ public class RunQuery {
 
             if (Files.isRegularFile(queryLocation)) {
 
-                queryString = new Scanner(new File(queryString))
-                        .useDelimiter("\\Z").next();
+                queryString = new Scanner(new File(queryString)).useDelimiter("\\Z").next();
 
                 logger.info("queryString: " + queryString);
 
                 Query query = QueryFactory.create(queryString);
                 ResultSet rs;
 
-                if(cmd.hasOption("f")) {
+                if (cmd.hasOption("f")) {
                     rs = endpointDataSource.executeQuery(query);
                 } else {
                     rs = hdtDataSource.executeQuery(query);
@@ -103,12 +101,13 @@ public class RunQuery {
                 int i = 0;
 
                 while (rs.hasNext()) {
-                    logger.info(((ResultBinding) rs.next()).getBinding()
-                            .get(query.getProjectVars().get(0)));
+                    logger.info(
+                            ((ResultBinding) rs.next())
+                                    .getBinding()
+                                    .get(query.getProjectVars().get(0)));
                     i++;
                 }
                 logger.info("results: " + i);
-
             }
         } catch (IOException e1) {
             System.out.println("Exception: " + e1.getMessage());

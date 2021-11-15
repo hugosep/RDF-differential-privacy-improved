@@ -28,8 +28,7 @@ import static symjava.symbolic.Symbol.x;
 
 public class RunSymbolic {
 
-    private static final Logger logger = LogManager
-            .getLogger(RunSymbolic.class.getName());
+    private static final Logger logger = LogManager.getLogger(RunSymbolic.class.getName());
 
     // privacy budget
     private static double EPSILON = 0.1;
@@ -41,6 +40,9 @@ public class RunSymbolic {
     private static String endpoint;
     private static boolean evaluation = false;
     private static boolean is_endpoint = false;
+
+    private static long startTime;
+    private static long endTime;
 
     public static void main(String[] args)
             throws IOException, CloneNotSupportedException, ExecutionException {
@@ -65,10 +67,10 @@ public class RunSymbolic {
 
             } else if (Files.isDirectory(queryLocation)) {
 
-                Iterator<Path> filesPath = Files
-                        .list(Paths.get(queryFile))
-                        .filter(p -> p.toString().endsWith(".rq"))
-                        .iterator();
+                Iterator<Path> filesPath =
+                        Files.list(Paths.get(queryFile))
+                                .filter(p -> p.toString().endsWith(".rq"))
+                                .iterator();
                 logger.info("Running analysis to DIRECTORY: " + queryLocation);
 
                 while (filesPath.hasNext()) {
@@ -80,7 +82,13 @@ public class RunSymbolic {
                     queryString = new Scanner(nextQuery).useDelimiter("\\Z").next();
 
                     try {
-                        runAnalysis(nextQuery.toString(), queryString, dataSource, outputFile, evaluation, EPSILON);
+                        runAnalysis(
+                                nextQuery.toString(),
+                                queryString,
+                                dataSource,
+                                outputFile,
+                                evaluation,
+                                EPSILON);
                     } catch (Exception e) {
                         logger.error("query failed!!: " + nextQuery);
                     }
@@ -107,6 +115,8 @@ public class RunSymbolic {
 
         // execute COUNT query
         int countQueryResult = dataSource.executeCountQuery(queryString);
+
+        startTime = System.nanoTime();
 
         Query q = QueryFactory.create(queryString);
 
@@ -142,14 +152,12 @@ public class RunSymbolic {
 
                 Sensitivity sensitivity = new Sensitivity(1.0, elasticStability);
 
-                smoothSensitivity = GraphElasticSensitivity.smoothElasticSensitivityStar(
-                        elasticStability,
-                        sensitivity,
-                        beta,
-                        k,
-                        graphSize);
+                smoothSensitivity =
+                        GraphElasticSensitivity.smoothElasticSensitivityStar(
+                                elasticStability, sensitivity, beta, k, graphSize);
 
-                logger.info("star query (smooth) sensitivity: " + smoothSensitivity.getSensitivity());
+                logger.info(
+                        "star query (smooth) sensitivity: " + smoothSensitivity.getSensitivity());
 
             } else {
                 /* elasticStability = GraphElasticSensitivity.calculateSensitivity(
@@ -169,26 +177,32 @@ public class RunSymbolic {
 
                 logger.info("Elastic Stability: " + sq.getElasticStability());
 
-                smoothSensitivity = GraphElasticSensitivity.smoothElasticSensitivity(
-                        sq.getElasticStability(),
-                        0,
-                        beta,
-                        k,
-                        graphSize);
+                smoothSensitivity =
+                        GraphElasticSensitivity.smoothElasticSensitivity(
+                                sq.getElasticStability(), 0, beta, k, graphSize);
 
                 logger.info("Path Smooth Sensitivity: " + smoothSensitivity.getSensitivity());
             }
 
             double scale = 2 * smoothSensitivity.getSensitivity() / EPSILON;
 
-            writeAnalysisResult(scale, queryFile, EPSILON, evaluation,
-                    countQueryResult, elasticStability, graphSize, starQuery,
-                    dataSource, smoothSensitivity, outputFile);
+            writeAnalysisResult(
+                    scale,
+                    queryFile,
+                    EPSILON,
+                    DELTA,
+                    evaluation,
+                    countQueryResult,
+                    elasticStability,
+                    graphSize,
+                    starQuery,
+                    dataSource,
+                    smoothSensitivity,
+                    outputFile);
         }
     }
 
-    private static void parseInput(String[] args)
-            throws IOException {
+    private static void parseInput(String[] args) throws IOException {
 
         Options options = new Options();
 
@@ -254,7 +268,6 @@ public class RunSymbolic {
                 logger.info("Missing output file");
             }
 
-
             if (cmd.hasOption("v")) {
                 evaluation = true;
             }
@@ -266,10 +279,18 @@ public class RunSymbolic {
     }
 
     private static void writeAnalysisResult(
-            double scale, String queryFile, double EPSILON,
-            boolean evaluation, int countQueryResult, Expr elasticStability,
-            long graphSize, boolean starQuery, DataSource dataSource,
-            Sensitivity smoothSensitivity, String outputFile)
+            double scale,
+            String queryFile,
+            double EPSILON,
+            double DELTA,
+            boolean evaluation,
+            int countQueryResult,
+            Expr elasticStability,
+            long graphSize,
+            boolean starQuery,
+            DataSource dataSource,
+            Sensitivity smoothSensitivity,
+            String outputFile)
             throws IOException {
 
         SecureRandom random = new SecureRandom();
@@ -303,25 +324,30 @@ public class RunSymbolic {
             resultList.add(countQueryResult);
         }
 
-        Result result = new Result(
-                queryFile,
-                EPSILON,
-                privateResultList,
-                smoothSensitivity.getSensitivity(),
-                resultList,
-                smoothSensitivity.getMaxK(),
-                scale,
-                elasticStability,
-                graphSize,
-                starQuery,
-                dataSource.getMapMostFreqValue(),
-                dataSource.getMapMostFreqValueStar());
+        // stopTime
+        endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        double durationInSeconds = (double) (duration / 1000000000);
+        System.out.println("Time: " + durationInSeconds + " seconds");
+
+        Result result =
+                new Result(
+                        queryFile,
+                        EPSILON,
+                        DELTA,
+                        privateResultList,
+                        smoothSensitivity.getSensitivity(),
+                        resultList,
+                        smoothSensitivity.getMaxK(),
+                        scale,
+                        elasticStability,
+                        graphSize,
+                        starQuery,
+                        dataSource.getMapMostFreqValue(),
+                        dataSource.getMapMostFreqValueStar());
 
         String resultsBuffer = result.toString().replace('\n', ' ') + "\n";
 
-        Files.write(
-                Paths.get(outputFile),
-                resultsBuffer.getBytes(),
-                StandardOpenOption.APPEND);
+        Files.write(Paths.get(outputFile), resultsBuffer.getBytes(), StandardOpenOption.APPEND);
     }
 }

@@ -18,12 +18,11 @@ import static symjava.symbolic.Symbol.x;
 
 public class GraphElasticSensitivity {
 
-    private static final Logger logger = LogManager.getLogger(GraphElasticSensitivity.class.getName());
+    private static final Logger logger =
+            LogManager.getLogger(GraphElasticSensitivity.class.getName());
 
-    public static double setOfMappingsSensitivity(Expr elasticSensitivity,
-                                                  double prevSensitivity,
-                                                  double beta,
-                                                  int k) {
+    public static double setOfMappingsSensitivity(
+            Expr elasticSensitivity, double prevSensitivity, double beta, int k) {
 
         Func f1 = new Func("f1", elasticSensitivity);
         BytecodeFunc func1 = f1.toBytecodeFunc();
@@ -43,10 +42,8 @@ public class GraphElasticSensitivity {
                                                  double EPSILON,
                                                  DataSource dataSource)
     */
-    public static StarQuery calculateSensitivity(List<StarQuery> listStars,
-                                                 DataSource dataSource)
-            throws ExecutionException,
-            CloneNotSupportedException {
+    public static StarQuery calculateSensitivity(List<StarQuery> listStars, DataSource dataSource)
+            throws ExecutionException, CloneNotSupportedException {
 
         StarQuery starQueryFirst = Collections.max(listStars);
         listStars.remove(starQueryFirst);
@@ -56,7 +53,7 @@ public class GraphElasticSensitivity {
         starQueryFirst.setElasticStability(elasticStabilityFirstStar);
         StarQuery starQuerySecond;
 
-        if(listStars.size() > 1) {
+        if (listStars.size() > 1) {
             starQuerySecond = calculateSensitivity(listStars, dataSource);
 
         } else {
@@ -72,9 +69,8 @@ public class GraphElasticSensitivity {
         return calculateJoinSensitivity(starQueryFirst, starQuerySecond, dataSource);
     }
 
-    private static StarQuery calculateJoinSensitivity(StarQuery starQueryLeft,
-                                                      StarQuery starQueryRight,
-                                                      DataSource hdtDataSource) {
+    private static StarQuery calculateJoinSensitivity(
+            StarQuery starQueryLeft, StarQuery starQueryRight, DataSource hdtDataSource) {
 
         List<String> joinVariables = starQueryLeft.getVariables();
         joinVariables.retainAll(starQueryRight.getVariables());
@@ -83,7 +79,8 @@ public class GraphElasticSensitivity {
         Expr mostPopularValueRight;
 
         if (starQueryLeft.getMostPopularValue() == null) {
-            mostPopularValueLeft = mostPopularValue(joinVariables.get(0), starQueryLeft, hdtDataSource);
+            mostPopularValueLeft =
+                    mostPopularValue(joinVariables.get(0), starQueryLeft, hdtDataSource);
             logger.info("mostPopularValueLeft: " + mostPopularValueLeft);
             starQueryLeft.setMostPopularValue(mostPopularValueLeft);
 
@@ -92,7 +89,8 @@ public class GraphElasticSensitivity {
         }
 
         if (starQueryRight.getMostPopularValue() == null) {
-            mostPopularValueRight = mostPopularValue(joinVariables.get(0), starQueryRight, hdtDataSource);
+            mostPopularValueRight =
+                    mostPopularValue(joinVariables.get(0), starQueryRight, hdtDataSource);
             logger.info("mostPopularValueRight: " + mostPopularValueRight);
             starQueryRight.setMostPopularValue(mostPopularValueRight);
         } else {
@@ -126,20 +124,17 @@ public class GraphElasticSensitivity {
     /*
      * mostPopularValue(joinVariable a, StarQuery starQuery, DataSource)
      */
-    private static Expr mostPopularValue(String var,
-                                         StarQuery starQuery,
-                                         DataSource dataSource) {
+    private static Expr mostPopularValue(String var, StarQuery starQuery, DataSource dataSource) {
         // base case: mp(a,s_1,G)
         Expr expr = x;
-        expr = expr.plus(dataSource.mostFrequentResult(new MaxFreqQuery(starQuery.toString(), var)));
+        expr =
+                expr.plus(
+                        dataSource.mostFrequentResult(new MaxFreqQuery(starQuery.toString(), var)));
         return expr;
     }
 
-    public static Sensitivity smoothElasticSensitivity(Expr elasticSensitivity,
-                                                       double prevSensitivity,
-                                                       double beta,
-                                                       int k,
-                                                       long graphSize) {
+    public static Sensitivity smoothElasticSensitivity(
+            Expr elasticSensitivity, double prevSensitivity, double beta, int k, long graphSize) {
 
         Sensitivity sensitivity = new Sensitivity(prevSensitivity, elasticSensitivity);
 
@@ -155,7 +150,7 @@ public class GraphElasticSensitivity {
         result = util.eval("NSolve(0==" + result.toString() + ",x)");
         String strResult = result.toString();
 
-        if(strResult.equals("{}")) {
+        if (strResult.equals("{}")) {
             logger.info("The function has no roots.");
         } else {
             /* OPTIMIZATION
@@ -197,10 +192,10 @@ public class GraphElasticSensitivity {
             logger.info("maxCandidate: " + maxCandidate);
 
             int maxI = 0;
-            if(maxCandidate < 0) {
+            if (maxCandidate < 0) {
                 maxCandidate = 0;
             }
-            //for (int i = 0; i < maxCandidate; i++) {
+            // for (int i = 0; i < maxCandidate; i++) {
 
             for (int i = 0; i < maxCandidate; i++) {
                 double kPrime = func1.apply(k);
@@ -229,8 +224,10 @@ public class GraphElasticSensitivity {
 
         // OPTIMIZATION
 
-        // It doesn't make sense iterate for f(x)=E^(-beta*x), because the function is a decreasing function.
-        // For this reason, the max value will be E^(-beta*x) with the initial x, in this case the parameter k.
+        // It doesn't make sense iterate for f(x)=E^(-beta*x), because the function is a decreasing
+        // function.
+        // For this reason, the max value will be E^(-beta*x) with the initial x, in this case the
+        // parameter k.
 
         /*for (int i = 0; i < graphSize; i++) {
 
@@ -243,9 +240,7 @@ public class GraphElasticSensitivity {
             k++;
         }*/
         Sensitivity smoothSensitivity = new Sensitivity(Math.exp(-k * beta), elasticSensitivity);
-        Sensitivity sens = new Sensitivity(
-                prevSensitivity.getSensitivity(),
-                elasticSensitivity);
+        Sensitivity sens = new Sensitivity(prevSensitivity.getSensitivity(), elasticSensitivity);
 
         sens.setMaxK(maxI);
         return sens;

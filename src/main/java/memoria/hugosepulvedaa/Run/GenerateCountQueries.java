@@ -23,11 +23,23 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class GenerateCountQueries {
-    
-    private static final Logger logger = LogManager
-            .getLogger(GenerateCountQueries.class.getName());
 
-//%SELECT DISTINCT ?var1  ?var1Label  ?var2  ?var2Label  ?var3  ?var4 WHERE {  ?var2 ( <http://www.wikidata.org/prop/direct/P31> / <http://www.wikidata.org/prop/direct/P279> *) <http://www.wikidata.org/entity/Q515> .  ?var1  <http://www.wikidata.org/prop/direct/P31>  <http://www.wikidata.org/entity/Q644371> .  ?var1  ?var5  ?var2 .  ?var1  <http://www.wikidata.org/prop/direct/P238>  ?var3 . SERVICE  <http://wikiba.se/ontology#around>   {    ?var2  <http://www.wikidata.org/prop/direct/P625>  ?var6 .    <http://www.bigdata.com/rdf#serviceParam>  <http://wikiba.se/ontology#center>  "POINT(-90 30)"^^<http://www.opengis.net/ont/geosparql#wktLiteral> .    <http://www.bigdata.com/rdf#serviceParam>  <http://wikiba.se/ontology#radius>  "200".    <http://www.bigdata.com/rdf#serviceParam>  <http://wikiba.se/ontology#distance>  ?var7 .  } SERVICE  <http://wikiba.se/ontology#label>   {    <http://www.bigdata.com/rdf#serviceParam>  <http://wikiba.se/ontology#language>  "en".  } OPTIONAL {  ?var2  <http://www.wikidata.org/prop/direct/P625>  ?var4 . }}ORDER BY ASC( ?var7 )LIMIT 1
+    private static final Logger logger = LogManager.getLogger(GenerateCountQueries.class.getName());
+
+    // %SELECT DISTINCT ?var1  ?var1Label  ?var2  ?var2Label  ?var3  ?var4 WHERE {  ?var2 (
+    // <http://www.wikidata.org/prop/direct/P31> / <http://www.wikidata.org/prop/direct/P279> *)
+    // <http://www.wikidata.org/entity/Q515> .  ?var1  <http://www.wikidata.org/prop/direct/P31>
+    // <http://www.wikidata.org/entity/Q644371> .  ?var1  ?var5  ?var2 .  ?var1
+    // <http://www.wikidata.org/prop/direct/P238>  ?var3 . SERVICE
+    // <http://wikiba.se/ontology#around>
+    //   {    ?var2  <http://www.wikidata.org/prop/direct/P625>  ?var6 .
+    // <http://www.bigdata.com/rdf#serviceParam>  <http://wikiba.se/ontology#center>  "POINT(-90
+    // 30)"^^<http://www.opengis.net/ont/geosparql#wktLiteral> .
+    // <http://www.bigdata.com/rdf#serviceParam>  <http://wikiba.se/ontology#radius>  "200".
+    // <http://www.bigdata.com/rdf#serviceParam>  <http://wikiba.se/ontology#distance>  ?var7 .  }
+    // SERVICE  <http://wikiba.se/ontology#label>   {    <http://www.bigdata.com/rdf#serviceParam>
+    // <http://wikiba.se/ontology#language>  "en".  } OPTIONAL {  ?var2
+    // <http://www.wikidata.org/prop/direct/P625>  ?var4 . }}ORDER BY ASC( ?var7 )LIMIT 1
 
     public static void main(String[] args) {
 
@@ -60,29 +72,21 @@ public class GenerateCountQueries {
             Path queryLocation = Paths.get(queryFile);
 
             if (Files.isRegularFile(queryLocation)) {
-                queryString = new Scanner(new File(queryFile))
-                        .useDelimiter("\\Z")
-                        .next();
-                System.out.println("queryString: " + queryString);
+                queryString = new Scanner(new File(queryFile)).useDelimiter("\\Z").next();
 
                 runQueryGeneration(queryString, outputDir);
 
             } else if (Files.isDirectory(queryLocation)) {
-                System.out.println("not queryString");
 
-                Iterator<Path> filesPath = Files
-                        .list(Paths.get(queryFile))
-                        .filter(p -> p
-                                .toString()
-                                .endsWith(".rq"))
-                        .iterator();
+                Iterator<Path> filesPath =
+                        Files.list(Paths.get(queryFile))
+                                .filter(p -> p.toString().endsWith(".rq"))
+                                .iterator();
 
                 while (filesPath.hasNext()) {
 
                     Path nextQuery = filesPath.next();
-                    queryString = new Scanner(nextQuery)
-                            .useDelimiter("\\Z")
-                            .next();
+                    queryString = new Scanner(nextQuery).useDelimiter("\\Z").next();
 
                     logger.info("Next query path: " + nextQuery);
                     runQueryGeneration(queryString, outputDir);
@@ -121,8 +125,7 @@ public class GenerateCountQueries {
         }
 
         if (triple.getSubject().isVariable()) {
-            if (vars.contains(triple.getSubject().getName()))
-                return true;
+            if (vars.contains(triple.getSubject().getName())) return true;
         }
 
         if (triple.getObject().isVariable()) {
@@ -138,7 +141,8 @@ public class GenerateCountQueries {
         return false;
     }
 
-    private static void runQueryGeneration(String queryString, String outputDir) throws IOException {
+    private static void runQueryGeneration(String queryString, String outputDir)
+            throws IOException {
 
         ArrayList<LinkedList<Triple>> relatedTriplesList = new ArrayList<>();
         Query q = QueryFactory.create(queryString);
@@ -216,8 +220,14 @@ public class GenerateCountQueries {
         for (Var var : q.getProjectVars()) {
 
             String varStr = var.getName();
-            StringBuilder newQueryString = new StringBuilder("SELECT (COUNT(?"
-                    + varStr + ") as " + "?count_" + varStr + ") WHERE {\n");
+            StringBuilder newQueryString =
+                    new StringBuilder(
+                            "SELECT (COUNT(?"
+                                    + varStr
+                                    + ") as "
+                                    + "?count_"
+                                    + varStr
+                                    + ") WHERE {\n");
 
             for (LinkedList<Triple> tripleList : relatedTriplesList) {
 
@@ -253,9 +263,9 @@ public class GenerateCountQueries {
             newQueryString.append("}");
 
             /*Files.write(
-                    Paths.get(outputDir + queryFile.replaceAll(".rq", "") + "."
-                            + var.getName() + ".rq"),
-                    newQueryString.toString().getBytes());*/
+            Paths.get(outputDir + queryFile.replaceAll(".rq", "") + "."
+                    + var.getName() + ".rq"),
+            newQueryString.toString().getBytes());*/
             Files.write(
                     Paths.get(outputDir + var.getName() + ".rq"),
                     newQueryString.toString().getBytes());

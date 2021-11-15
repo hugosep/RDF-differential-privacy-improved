@@ -13,6 +13,7 @@ public class Result {
 
     private String query;
     private double epsilon;
+    private double delta;
     private List<Double> privateResult;
     private double sensitivity;
     private List<Integer> result;
@@ -25,14 +26,23 @@ public class Result {
     private boolean starQuery;
 
     public Result(
-            String query, double epsilon, List<Double> resultList,
-            double sensitivity, List<Integer>  result,
-            int maxK, double scale, Expr elasticStability,
-            long graphSize, boolean starQuery, Map<String, List<Integer>> mapMostFreqValue,
+            String query,
+            double epsilon,
+            double delta,
+            List<Double> resultList,
+            double sensitivity,
+            List<Integer> result,
+            int maxK,
+            double scale,
+            Expr elasticStability,
+            long graphSize,
+            boolean starQuery,
+            Map<String, List<Integer>> mapMostFreqValue,
             Map<String, List<StarQuery>> mapMostFreqValueStar) {
 
         this.query = query;
         this.epsilon = epsilon;
+        this.delta = delta;
         this.privateResult = resultList;
         this.sensitivity = sensitivity;
         this.result = result;
@@ -45,9 +55,9 @@ public class Result {
         this.mapMostFreqValueStar = mapMostFreqValueStar;
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(this);
     }
-
 }

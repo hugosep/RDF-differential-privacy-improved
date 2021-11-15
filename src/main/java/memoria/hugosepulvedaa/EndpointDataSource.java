@@ -16,9 +16,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
-/**
- * @author cbuil
- */
+/** @author cbuil */
 public class EndpointDataSource implements DataSource {
 
     private static final Logger logger = LogManager.getLogger(EndpointDataSource.class.getName());
@@ -27,54 +25,72 @@ public class EndpointDataSource implements DataSource {
     private static LoadingCache<String, Integer> countQueriesCache;
     private static LoadingCache<Query, Long> graphSizeCache;
     private static LoadingCache<List<List<String>>, Long> graphSizeTriplesCache;
-    private final static Map<String, List<Integer>> mapMostFreqValue = new HashMap<>();
-    private final static Map<String, List<StarQuery>> mapMostFreqValueStar = new HashMap<>();
+    private static final Map<String, List<Integer>> mapMostFreqValue = new HashMap<>();
+    private static final Map<String, List<StarQuery>> mapMostFreqValueStar = new HashMap<>();
 
     public EndpointDataSource(String endpoint) {
 
         dataSource = endpoint;
 
-        mostFrequentResultCache = CacheBuilder
-                .newBuilder()
-                .recordStats()
-                .maximumWeight(100000)
-                .weigher((Weigher<MaxFreqQuery, Integer>) (k, resultSize) -> k.getQuerySize())
-                .build(new CacheLoader<MaxFreqQuery, Integer>() {
+        mostFrequentResultCache =
+                CacheBuilder.newBuilder()
+                        .recordStats()
+                        .maximumWeight(100000)
+                        .weigher(
+                                (Weigher<MaxFreqQuery, Integer>)
+                                        (k, resultSize) -> k.getQuerySize())
+                        .build(
+                                new CacheLoader<MaxFreqQuery, Integer>() {
 
-                    @Override public Integer load(MaxFreqQuery s) {
-                        logger.info("into mostPopularValueCache CacheLoader, loading: " + s);
-                        return getMostFrequentResult(s.getQuery(), s.getVariableString());
-                    }
-                });
+                                    @Override
+                                    public Integer load(MaxFreqQuery s) {
+                                        logger.info(
+                                                "into mostPopularValueCache CacheLoader, loading: "
+                                                        + s);
+                                        return getMostFrequentResult(
+                                                s.getQuery(), s.getVariableString());
+                                    }
+                                });
 
-        graphSizeCache = CacheBuilder
-                .newBuilder()
-                .recordStats()
-                .maximumWeight(1000)
-                .weigher((Weigher<Query, Long>) (k, resultSize) -> k.toString().length())
-                .build(new CacheLoader<Query, Long>() {
+        graphSizeCache =
+                CacheBuilder.newBuilder()
+                        .recordStats()
+                        .maximumWeight(1000)
+                        .weigher((Weigher<Query, Long>) (k, resultSize) -> k.toString().length())
+                        .build(
+                                new CacheLoader<Query, Long>() {
 
-                    @Override public Long load(Query query) {
-                        logger.debug("into graphSizeCache CacheLoader, loading: " + query);
-                        return calculateGraphSize(query);
-                    }
-                });
+                                    @Override
+                                    public Long load(Query query) {
+                                        logger.debug(
+                                                "into graphSizeCache CacheLoader, loading: "
+                                                        + query);
+                                        return calculateGraphSize(query);
+                                    }
+                                });
 
-        graphSizeTriplesCache = CacheBuilder
-                .newBuilder()
-                .recordStats()
-                .maximumWeight(1000)
-                .weigher((Weigher<List<List<String>>, Long>) (k, resultSize) -> k.toString().length())
-                .build(new CacheLoader<List<List<String>>, Long>() {
+        graphSizeTriplesCache =
+                CacheBuilder.newBuilder()
+                        .recordStats()
+                        .maximumWeight(1000)
+                        .weigher(
+                                (Weigher<List<List<String>>, Long>)
+                                        (k, resultSize) -> k.toString().length())
+                        .build(
+                                new CacheLoader<List<List<String>>, Long>() {
 
-                    @Override public Long load(List<List<String>> triplePatternsCount) {
-                        //logger.debug("into graphSizeCacheTriples CacheLoader, loading: " + triplePatternsCount);
-                        return calculateGraphSizeTriples(triplePatternsCount);
-                    }
-                });
+                                    @Override
+                                    public Long load(List<List<String>> triplePatternsCount) {
+                                        logger.debug(
+                                                "into graphSizeCacheTriples CacheLoader, loading: "
+                                                        + triplePatternsCount);
+                                        return calculateGraphSizeTriples(triplePatternsCount);
+                                    }
+                                });
     }
 
-    @Override public ResultSet executeQuery(Query query) {
+    @Override
+    public ResultSet executeQuery(Query query) {
 
         try (QueryExecution qexec = QueryExecutionFactory.sparqlService(dataSource, query)) {
             ResultSet results = qexec.execSelect();
@@ -84,9 +100,9 @@ public class EndpointDataSource implements DataSource {
         }
     }
 
-
-    @Override public long getGraphSize(Query query) {
-        return(graphSizeCache.getUnchecked(query));
+    @Override
+    public long getGraphSize(Query query) {
+        return (graphSizeCache.getUnchecked(query));
     }
 
     public long calculateGraphSize(Query query) {
@@ -98,28 +114,32 @@ public class EndpointDataSource implements DataSource {
         try (QueryExecution qexec = QueryExecutionFactory.sparqlService(dataSource, query)) {
             Model results = qexec.execConstruct();
             resultSize = results.size();
-            logger.info("results: " + results);
+            logger.info("graphSize: " + results);
         }
         return resultSize;
     }
 
-    @Override public int executeCountQuery(String queryString) {
+    @Override
+    public int executeCountQuery(String queryString) {
 
         Query query = QueryFactory.create(queryString);
 
         Element queryPattern = query.getQueryPattern();
 
-        logger.info("query: " + query);
-        logger.info("queryPattern: " + queryPattern);
+        // logger.info("query: " + query);
+        // logger.info("queryPattern: " + queryPattern);
 
-        String constructQuery = "CONSTRUCT" + queryPattern + " WHERE " + queryPattern;
+        String constructQuery = "CONSTRUCT " + queryPattern + " WHERE " + queryPattern;
 
-        System.out.println("constructQuery: " + constructQuery);
+        logger.info("constructQuery: " + constructQuery);
 
-        try (QueryExecution qexec = QueryExecutionFactory.sparqlService(dataSource, constructQuery)) {
+        try (QueryExecution qexec =
+                QueryExecutionFactory.sparqlService(dataSource, constructQuery)) {
             Model results = qexec.execConstruct();
             long resultSize = results.size();
-            logger.info("results: " + resultSize);
+            logger.info("result number of triples: " + resultSize);
+        } catch (Exception e) {
+            logger.info("Failed execConstruct: " + e.getCause());
         }
 
         /* no entiendo por que esta esto
@@ -146,10 +166,11 @@ public class EndpointDataSource implements DataSource {
     }
 
     /*
-        @description Sum all COUNTs of every generated query.
-     */
-    @Override public Long getGraphSizeTriples(List<List<String>> triplePatternsCount) {
-        return(graphSizeTriplesCache.getUnchecked(triplePatternsCount));
+       @description Sum all COUNTs of every generated query.
+    */
+    @Override
+    public Long getGraphSizeTriples(List<List<String>> triplePatternsCount) {
+        return (graphSizeTriplesCache.getUnchecked(triplePatternsCount));
     }
 
     public Long calculateGraphSizeTriples(List<List<String>> triplePatternsCount) {
@@ -174,7 +195,8 @@ public class EndpointDataSource implements DataSource {
         return count;
     }
 
-    @Override public int mostFrequentResult(MaxFreqQuery maxFreqQuery) {
+    @Override
+    public int mostFrequentResult(MaxFreqQuery maxFreqQuery) {
         try {
             return mostFrequentResultCache.get(maxFreqQuery);
         } catch (ExecutionException e) {
@@ -183,8 +205,10 @@ public class EndpointDataSource implements DataSource {
         }
     }
 
-    @Override public void setMostFreqValueMaps(Map<String, List<TriplePath>> starQueriesMap,
-                                               List<List<String>> triplePatterns) throws ExecutionException {
+    @Override
+    public void setMostFreqValueMaps(
+            Map<String, List<TriplePath>> starQueriesMap, List<List<String>> triplePatterns)
+            throws ExecutionException {
 
         Map<String, List<Integer>> mapMostFreqValue = new HashMap<>();
         Map<String, List<StarQuery>> mapMostFreqValueStar = new HashMap<>();
@@ -214,7 +238,7 @@ public class EndpointDataSource implements DataSource {
                     triple += " ?s" + i + " ";
                 }
 
-                triple += "<" + triplePath.getPredicate().getURI() + "> ";
+                triple += " <" + triplePath.getPredicate().getURI() + "> ";
 
                 if (triplePath.getObject().isVariable()) {
                     varStrings.add(triplePath.getObject().getName());
@@ -237,7 +261,8 @@ public class EndpointDataSource implements DataSource {
                 // EDITED
                 logger.info("var: " + var);
 
-                MaxFreqQuery query = new MaxFreqQuery(Helper.getStarQueryString(starQueryLeft), var);
+                MaxFreqQuery query =
+                        new MaxFreqQuery(Helper.getStarQueryString(starQueryLeft), var);
 
                 if (mapMostFreqValue.containsKey(var)) {
                     List<Integer> mostFreqValues = mapMostFreqValue.get(var);
@@ -268,21 +293,33 @@ public class EndpointDataSource implements DataSource {
         }
     }
 
-    @Override public Map<String, List<StarQuery>> getMapMostFreqValueStar() {
+    @Override
+    public Map<String, List<StarQuery>> getMapMostFreqValueStar() {
         return mapMostFreqValueStar;
     }
 
-    @Override public Map<String, List<Integer>> getMapMostFreqValue() {
+    @Override
+    public Map<String, List<Integer>> getMapMostFreqValue() {
         return mapMostFreqValue;
     }
 
     private int getMostFrequentResult(String starQuery, String variableName) {
 
         variableName = variableName.replace("“", "").replace("”", "");
-        String maxFreqQueryString = "SELECT (COUNT(?" + variableName
-                + ") AS ?count) WHERE { SELECT ?" + variableName + " WHERE { " + starQuery + "} LIMIT 1000000 " + "} GROUP BY ?"
-                + variableName + " " + "ORDER BY ?" + variableName
-                + " DESC (?count) LIMIT 1 ";
+        String maxFreqQueryString =
+                "SELECT (COUNT(?"
+                        + variableName
+                        + ") AS ?count) WHERE { SELECT ?"
+                        + variableName
+                        + " WHERE { "
+                        + starQuery
+                        + "} LIMIT 1000000 "
+                        + "} GROUP BY ?"
+                        + variableName
+                        + " "
+                        + "ORDER BY ?"
+                        + variableName
+                        + " DESC (?count) LIMIT 1 ";
 
         logger.info("query at getMostFrequentResult: " + maxFreqQueryString);
 

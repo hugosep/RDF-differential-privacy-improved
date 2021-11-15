@@ -13,18 +13,14 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.Callable;
 
-/**
- *
- * @author cbuil
- */
+/** @author cbuil */
 public class RunSparqlQuery implements Callable<String> {
 
-   Model triples;
-   String queryString;
-   String queryFileName;
-   
-   private static final Logger logger = LogManager
-            .getLogger(RunSparqlQuery.class.getName());
+    Model triples;
+    String queryString;
+    String queryFileName;
+
+    private static final Logger logger = LogManager.getLogger(RunSparqlQuery.class.getName());
 
     RunSparqlQuery(Model dataSource, String queryString, String queryFileName) {
         this.triples = dataSource;
@@ -32,11 +28,11 @@ public class RunSparqlQuery implements Callable<String> {
         this.queryFileName = queryFileName;
     }
 
-   @Override public String call() {
+    @Override
+    public String call() {
         Query query = QueryFactory.create(queryString);
 
-        try (QueryExecution qexec = QueryExecutionFactory.create(query,
-                triples)) {
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, triples)) {
 
             ResultSet results = qexec.execSelect();
             results = ResultSetFactory.copyResults(results);
@@ -47,9 +43,8 @@ public class RunSparqlQuery implements Callable<String> {
             logger.info("count query result (dataset): " + countResult);
             return queryFileName + '\t' + countResult;
         } catch (Exception e) {
-            System.out.println ("Exception is caught:" + e.getMessage());
+            System.out.println("Exception is caught:" + e.getMessage());
         }
         return queryFileName + "\t-1";
-    } 
+    }
 }
-

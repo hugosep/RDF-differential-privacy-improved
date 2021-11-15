@@ -13,11 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-/**
- *
- * @author cbuil
- */
-
+/** @author cbuil */
 public interface DataSource {
 
     int mostFrequentResult(MaxFreqQuery maxFreqQuery);
@@ -31,9 +27,8 @@ public interface DataSource {
     Long getGraphSizeTriples(List<List<String>> triplePatternsCount);
 
     void setMostFreqValueMaps(
-            Map<String, List<TriplePath>> starQueriesMap,
-            List<List<String>> triplePatterns)
-             throws ExecutionException;
+            Map<String, List<TriplePath>> starQueriesMap, List<List<String>> triplePatterns)
+            throws ExecutionException;
 
     Map<String, List<StarQuery>> getMapMostFreqValueStar();
 
