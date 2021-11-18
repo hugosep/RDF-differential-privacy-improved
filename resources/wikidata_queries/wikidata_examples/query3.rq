@@ -2,4 +2,4 @@ SELECT  ( COUNT (?var5) AS  ?c  )
 WHERE   {
     ?var5  <http://www.wikidata.org/prop/direct/P4963>  ?var6 .
     ?var5  <http://www.wikidata.org/prop/direct/P31>  <http://www.wikidata.org/entity/Q5> .
-      } 
+}

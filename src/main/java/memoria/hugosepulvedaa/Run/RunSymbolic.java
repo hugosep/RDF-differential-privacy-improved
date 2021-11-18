@@ -131,7 +131,9 @@ public class RunSymbolic {
         if (element instanceof ElementPathBlock) {
 
             Expr elasticStability = Expr.valueOf(0);
-            int k = 1;
+
+            //int k = 1;
+            int k = 0;
 
             Map<String, List<TriplePath>> starQueriesMap = Helper.getStarPatterns(q);
 
@@ -154,7 +156,7 @@ public class RunSymbolic {
 
                 smoothSensitivity =
                         GraphElasticSensitivity.smoothElasticSensitivityStar(
-                                elasticStability, sensitivity, beta, k, graphSize);
+                                elasticStability, sensitivity, beta, k);
 
                 logger.info(
                         "star query (smooth) sensitivity: " + smoothSensitivity.getSensitivity());

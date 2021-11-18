@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static symjava.symbolic.Symbol.x;
 
@@ -150,9 +151,13 @@ public class GraphElasticSensitivity {
         result = util.eval("NSolve(0==" + result.toString() + ",x)");
         String strResult = result.toString();
 
+        double ceilMaxCandidate = k;
+        int maxI = k;
+
         if (strResult.equals("{}")) {
             logger.info("The function has no roots.");
         } else {
+
             /* OPTIMIZATION
              * If we maximize E^(-beta*x)*P(x), where P(x) is a polynomial.
              * The maximal value can be determined finding the max maximal of the function, where it is decreasing to
@@ -162,87 +167,63 @@ public class GraphElasticSensitivity {
             strResult = strResult.substring(1, strResult.length() - 1);
 
             String[] arrayZeros = strResult.split(",");
-            List<String> listZeros = new ArrayList<>(Arrays.asList(arrayZeros));
+            List<String> listStrZeros = new ArrayList<>(Arrays.asList(arrayZeros));
 
-            listZeros.replaceAll(zero -> zero.substring(1, zero.length() - 1));
-            listZeros.replaceAll(zero -> zero.substring(3));
+            listStrZeros.replaceAll(zero -> zero.substring(1, zero.length() - 1));
+            listStrZeros.replaceAll(zero -> zero.substring(3));
 
-            listZeros.removeIf(zero -> zero.contains("I"));
-            listZeros.removeIf(zero -> zero.contains("i"));
+            listStrZeros.removeIf(zero -> zero.contains("I"));
+            listStrZeros.removeIf(zero -> zero.contains("i"));
 
-            System.out.println("Out[3]: " + result);
-            System.out.println("Out[3]: " + listZeros);
+            List<Double> listDoubleZeros =
+                    listStrZeros.stream().map(util::evalf).collect(Collectors.toList());
 
-            double ceilValue;
-            double floorValue;
-            double zeroFloat;
+            double maxCandidate = Collections.max(listDoubleZeros);
 
-            List<Integer> candidates = new ArrayList<Integer>(listZeros.size() * 2);
-
-            for (String zero : listZeros) {
-                zeroFloat = util.evalf(zero);
-                ceilValue = Math.ceil(zeroFloat);
-                floorValue = Math.floor(zeroFloat);
-                candidates.add((int) ceilValue);
-                candidates.add((int) floorValue);
-            }
-            int maxCandidate = Collections.max(candidates);
+            ceilMaxCandidate = (int) Math.ceil(maxCandidate);
 
             logger.info("graphSize: " + graphSize);
             logger.info("maxCandidate: " + maxCandidate);
 
-            int maxI = 0;
-            if (maxCandidate < 0) {
-                maxCandidate = 0;
+            if (ceilMaxCandidate < 0) {
+                ceilMaxCandidate = k;
             }
-            // for (int i = 0; i < maxCandidate; i++) {
-
-            for (int i = 0; i < maxCandidate; i++) {
-                double kPrime = func1.apply(k);
-                double smoothSensitivity = Math.exp(-k * beta) * kPrime;
-
-                if (smoothSensitivity > prevSensitivity) {
-                    prevSensitivity = smoothSensitivity;
-                    maxI = i;
-                }
-                k++;
-            }
-            sensitivity.setMaxK(maxI);
-            sensitivity.setSensitivity(prevSensitivity);
         }
+
+        for (int i = k; i <= ceilMaxCandidate; i++) {
+            double kPrime = func1.apply(i);
+            double smoothSensitivity = Math.exp(-i * beta) * kPrime;
+
+            if (smoothSensitivity > prevSensitivity) {
+                prevSensitivity = smoothSensitivity;
+                maxI = i;
+            }
+        }
+
+        sensitivity.setMaxK(maxI);
+        sensitivity.setSensitivity(prevSensitivity);
+
         return sensitivity;
     }
 
     public static Sensitivity smoothElasticSensitivityStar(
-            Expr elasticSensitivity,
-            Sensitivity prevSensitivity,
-            double beta,
-            int k,
-            long graphSize) {
+            Expr elasticSensitivity, Sensitivity prevSensitivity, double beta, int k) {
 
-        int maxI = 0;
+        /* OPTIMIZATION
+         * It doesn't make sense iterate for f(x)=E^(-beta*x), because the function is a decreasing
+         * function.
+         * For this reason, the max value will be E^(-beta*x) with the initial x, in this case the
+         * parameter k.
+         */
 
-        // OPTIMIZATION
+        double exponentialPart = Math.exp(-k * beta);
+        Sensitivity smoothSensitivity = new Sensitivity(exponentialPart, elasticSensitivity);
+        smoothSensitivity.setMaxK(k);
 
-        // It doesn't make sense iterate for f(x)=E^(-beta*x), because the function is a decreasing
-        // function.
-        // For this reason, the max value will be E^(-beta*x) with the initial x, in this case the
-        // parameter k.
+        if (smoothSensitivity.getSensitivity() > prevSensitivity.getSensitivity()) {
+            return smoothSensitivity;
+        }
 
-        /*for (int i = 0; i < graphSize; i++) {
-
-            Sensitivity smoothSensitivity = new Sensitivity(Math.exp(-k * beta), elasticSensitivity);
-
-            if (smoothSensitivity.getSensitivity() > prevSensitivity.getSensitivity()) {
-                prevSensitivity = smoothSensitivity;
-                maxI = i;
-            }
-            k++;
-        }*/
-        Sensitivity smoothSensitivity = new Sensitivity(Math.exp(-k * beta), elasticSensitivity);
-        Sensitivity sens = new Sensitivity(prevSensitivity.getSensitivity(), elasticSensitivity);
-
-        sens.setMaxK(maxI);
-        return sens;
+        return prevSensitivity;
     }
 }

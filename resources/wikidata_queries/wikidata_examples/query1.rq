@@ -1,1 +1,5 @@
-SELECT ( COUNT (?var4) AS  ?c  ) WHERE { ?var4  <http://www.wikidata.org/prop/direct/P901>  ?var5 ; <http://www.wikidata.org/prop/direct/P31>  ?var1 . }
+SELECT ( COUNT (?var4) AS  ?c  )
+WHERE {
+    ?var4  <http://www.wikidata.org/prop/direct/P901>  ?var5 ;
+    <http://www.wikidata.org/prop/direct/P31>  ?var1 .
+}
