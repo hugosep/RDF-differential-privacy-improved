@@ -89,16 +89,17 @@ public class RunQuery {
 
                 logger.info("queryString: " + queryString);
 
-                Query query = QueryFactory.create(queryString);
-                ResultSet rs;
+                // Query query = QueryFactory.create(queryString);
+                // ResultSet rs;
+                int result;
 
                 if (cmd.hasOption("f")) {
-                    rs = endpointDataSource.executeQuery(query);
+                    result = endpointDataSource.executeCountQuery(queryString);
                 } else {
-                    rs = hdtDataSource.executeQuery(query);
+                    result = hdtDataSource.executeCountQuery(queryString);
                 }
 
-                int i = 0;
+                /* int i = 0;
 
                 while (rs.hasNext()) {
                     logger.info(
@@ -107,7 +108,8 @@ public class RunQuery {
                                     .get(query.getProjectVars().get(0)));
                     i++;
                 }
-                logger.info("results: " + i);
+                 */
+                logger.info("results: " + result);
             }
         } catch (IOException e1) {
             System.out.println("Exception: " + e1.getMessage());

@@ -159,7 +159,7 @@ public class RunSymbolic {
                                 elasticStability, sensitivity, beta, k);
 
                 logger.info(
-                        "star query (smooth) sensitivity: " + smoothSensitivity.getSensitivity());
+                        "Star query (smooth) sensitivity: " + smoothSensitivity.getSensitivity());
 
             } else {
                 /* elasticStability = GraphElasticSensitivity.calculateSensitivity(

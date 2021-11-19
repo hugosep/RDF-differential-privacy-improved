@@ -23,7 +23,7 @@ public class EndpointDataSource implements DataSource {
     private final String dataSource;
     private static LoadingCache<MaxFreqQuery, Integer> mostFrequentResultCache;
     private static LoadingCache<String, Integer> countQueriesCache;
-    private static LoadingCache<Query, Long> graphSizeCache;
+    private static LoadingCache<Query, Model> graphModelsCache;
     private static LoadingCache<List<List<String>>, Long> graphSizeTriplesCache;
     private static final Map<String, List<Integer>> mapMostFreqValue = new HashMap<>();
     private static final Map<String, List<StarQuery>> mapMostFreqValueStar = new HashMap<>();
@@ -52,20 +52,20 @@ public class EndpointDataSource implements DataSource {
                                     }
                                 });
 
-        graphSizeCache =
+        graphModelsCache =
                 CacheBuilder.newBuilder()
                         .recordStats()
                         .maximumWeight(1000)
-                        .weigher((Weigher<Query, Long>) (k, resultSize) -> k.toString().length())
+                        .weigher((Weigher<Query, Model>) (k, resultSize) -> k.toString().length())
                         .build(
-                                new CacheLoader<Query, Long>() {
+                                new CacheLoader<Query, Model>() {
 
                                     @Override
-                                    public Long load(Query query) {
+                                    public Model load(Query query) {
                                         logger.debug(
                                                 "into graphSizeCache CacheLoader, loading: "
                                                         + query);
-                                        return calculateGraphSize(query);
+                                        return executeConstructQuery(query);
                                     }
                                 });
 
@@ -90,33 +90,21 @@ public class EndpointDataSource implements DataSource {
     }
 
     @Override
-    public ResultSet executeQuery(Query query) {
+    public long getGraphSize(Query query) {
+        return (graphModelsCache.getUnchecked(query).size());
+    }
 
-        try (QueryExecution qexec = QueryExecutionFactory.sparqlService(dataSource, query)) {
-            ResultSet results = qexec.execSelect();
-            results = ResultSetFactory.copyResults(results);
-            qexec.close();
+    public Model executeConstructQuery(Query query) {
+        Element queryPattern = query.getQueryPattern();
+
+        String constructQuery = "CONSTRUCT " + queryPattern + " WHERE " + queryPattern;
+
+        logger.info("constructQuery: " + constructQuery);
+
+        try (QueryExecution qexec = QueryExecutionFactory.sparqlService(dataSource, constructQuery)) {
+            Model results = qexec.execConstruct();
             return results;
         }
-    }
-
-    @Override
-    public long getGraphSize(Query query) {
-        return (graphSizeCache.getUnchecked(query));
-    }
-
-    public long calculateGraphSize(Query query) {
-        long resultSize;
-
-        System.out.println("Query:" + query);
-        System.out.println("Get query pattern:" + query.getQueryPattern());
-
-        try (QueryExecution qexec = QueryExecutionFactory.sparqlService(dataSource, query)) {
-            Model results = qexec.execConstruct();
-            resultSize = results.size();
-            logger.info("graphSize: " + results);
-        }
-        return resultSize;
     }
 
     @Override
@@ -124,31 +112,20 @@ public class EndpointDataSource implements DataSource {
 
         Query query = QueryFactory.create(queryString);
 
-        Element queryPattern = query.getQueryPattern();
-
-        // logger.info("query: " + query);
-        // logger.info("queryPattern: " + queryPattern);
-
-        String constructQuery = "CONSTRUCT " + queryPattern + " WHERE " + queryPattern;
-
-        logger.info("constructQuery: " + constructQuery);
-
-        try (QueryExecution qexec =
-                QueryExecutionFactory.sparqlService(dataSource, constructQuery)) {
-            Model results = qexec.execConstruct();
-            long resultSize = results.size();
-            logger.info("result number of triples: " + resultSize);
-        } catch (Exception e) {
-            logger.info("Failed execConstruct: " + e.getCause());
-        }
-
         /* no entiendo por que esta esto
         if (queryString.contains("http://www.wikidata.org/prop/direct/P31") &&
                 (queryString.lastIndexOf('?') != queryString.indexOf('?'))) {
             return 85869721;
         }*/
+        QueryExecution qexec;
 
-        QueryExecution qexec = QueryExecutionFactory.sparqlService(dataSource, query);
+        try {
+            Model modelQuery = graphModelsCache.get(query);
+            qexec = QueryExecutionFactory.create(query, modelQuery);
+
+        } catch (ExecutionException e) {
+            qexec = QueryExecutionFactory.sparqlService(dataSource, query);
+        }
 
         ResultSet results = qexec.execSelect();
         QuerySolution soln = results.nextSolution();
@@ -161,7 +138,6 @@ public class EndpointDataSource implements DataSource {
         int countResult = x.asLiteral().getInt();
 
         logger.info("Count query result (endpoint): " + countResult);
-
         return countResult;
     }
 
@@ -197,12 +173,7 @@ public class EndpointDataSource implements DataSource {
 
     @Override
     public int mostFrequentResult(MaxFreqQuery maxFreqQuery) {
-        try {
-            return mostFrequentResultCache.get(maxFreqQuery);
-        } catch (ExecutionException e) {
-            logger.info("problem searching in cache maxFreqQuery: " + e.getCause());
-            return -1;
-        }
+        return mostFrequentResultCache.getUnchecked(maxFreqQuery);
     }
 
     @Override
@@ -269,7 +240,7 @@ public class EndpointDataSource implements DataSource {
                     List<StarQuery> mostFreqValuesStar = mapMostFreqValueStar.get(var);
 
                     if (!mostFreqValues.isEmpty()) {
-                        mostFreqValues.add(mostFrequentResultCache.get(query));
+                        mostFreqValues.add(mostFrequentResultCache.getUnchecked(query));
                         mapMostFreqValue.put(var, mostFreqValues);
 
                         mostFreqValuesStar.add(new StarQuery(starQueryLeft));
@@ -281,7 +252,7 @@ public class EndpointDataSource implements DataSource {
                     logger.info("Query: " + query.getQuery());
                     logger.info("Variable: " + query.getVariableString());
 
-                    mostFreqValues.add(mostFrequentResultCache.get(query));
+                    mostFreqValues.add(mostFrequentResultCache.getUnchecked(query));
                     mapMostFreqValue.put(var, mostFreqValues);
 
                     List<StarQuery> mostFreqValuesStar = new ArrayList<>();
@@ -306,6 +277,7 @@ public class EndpointDataSource implements DataSource {
     private int getMostFrequentResult(String starQuery, String variableName) {
 
         variableName = variableName.replace("“", "").replace("”", "");
+
         String maxFreqQueryString =
                 "SELECT (COUNT(?"
                         + variableName

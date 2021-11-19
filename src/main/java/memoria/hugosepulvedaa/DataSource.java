@@ -18,8 +18,6 @@ public interface DataSource {
 
     int mostFrequentResult(MaxFreqQuery maxFreqQuery);
 
-    ResultSet executeQuery(Query query);
-
     long getGraphSize(Query query);
 
     int executeCountQuery(String queryString);

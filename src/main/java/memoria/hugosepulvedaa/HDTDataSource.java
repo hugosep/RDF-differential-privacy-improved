@@ -132,17 +132,6 @@ public class HDTDataSource implements DataSource {
     }
 
     @Override
-    public ResultSet executeQuery(Query query) {
-
-        try (QueryExecution qexec = QueryExecutionFactory.create(query, triples)) {
-            ResultSet results = qexec.execSelect();
-            results = ResultSetFactory.copyResults(results);
-            qexec.close();
-            return results;
-        }
-    }
-
-    @Override
     public long getGraphSize(Query query) {
         try (QueryExecution qexec = QueryExecutionFactory.create(query, triples)) {
             Model results = qexec.execConstruct();
@@ -156,11 +145,16 @@ public class HDTDataSource implements DataSource {
     public int executeCountQuery(String queryString) {
         Query query = QueryFactory.create(queryString);
         logger.info("count query: " + queryString);
-        ResultSet results = executeQuery(query);
+        /*ResultSet results = executeQuery(query);
         QuerySolution soln = results.nextSolution();
         RDFNode x = soln.get(soln.varNames().next());
         int countResult = x.asLiteral().getInt();
+        */
+
+        // INFINITE RECURSION
+        int countResult = executeCountQuery(queryString);
         logger.info("count query result (dataset): " + countResult);
+        // return countResult;
         return countResult;
     }
 
