@@ -114,7 +114,7 @@ public class RunSymbolic {
             String outputFile,
             boolean evaluation,
             double EPSILON)
-            throws IOException, CloneNotSupportedException, ExecutionException {
+            throws IOException, ExecutionException {
 
         // execute COUNT query
         int countQueryResult = dataSource.executeCountQuery(queryString);
@@ -234,39 +234,33 @@ public class RunSymbolic {
             if (cmd.hasOption("q")) {
                 queryString = cmd.getOptionValue("q");
                 queryString = queryString.substring(1, queryString.length() - 1);
-            } else {
-                logger.info("Missing SPARQL query");
+                logger.info("SPARQL query");
             }
 
             if (cmd.hasOption("endpoint")) {
                 endpoint = cmd.getOptionValue("endpoint");
                 is_endpoint = true;
-            } else {
-                logger.info("Missing SPARQL query endpoint");
+                logger.info("SPARQL query endpoint");
             }
 
             if (cmd.hasOption("eps")) {
                 EPSILON = Double.parseDouble(cmd.getOptionValue("eps"));
-            } else {
-                logger.info("Missing epsilon parameter");
+                logger.info("Epsilon parameter");
             }
 
             if (cmd.hasOption("f")) {
                 queryFile = cmd.getOptionValue("f");
-            } else {
-                logger.info("Missing SPARQL query file");
+                logger.info("SPARQL query file");
             }
 
             if (cmd.hasOption("d")) {
                 dataFile = cmd.getOptionValue("d");
-            } else {
-                logger.info("Missing data file");
+                logger.info("Data file");
             }
 
             if (cmd.hasOption("e")) {
                 queryFile = cmd.getOptionValue("e");
-            } else {
-                logger.info("Missing queries directory");
+                logger.info("Queries directory");
             }
 
             if (cmd.hasOption("o")) {
@@ -275,16 +269,15 @@ public class RunSymbolic {
                 if (!Files.exists(Paths.get(outputFile))) {
                     Files.createFile(Paths.get(outputFile));
                 }
-            } else {
-                logger.info("Missing output file");
+                logger.info("Output file");
             }
 
             if (cmd.hasOption("v")) {
                 evaluation = true;
             }
 
-        } catch (ParseException e1) {
-            System.out.println(e1.getMessage());
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
             System.exit(-1);
         }
     }

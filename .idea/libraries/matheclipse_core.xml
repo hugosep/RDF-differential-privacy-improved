@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="matheclipse-core">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/matheclipse-core.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

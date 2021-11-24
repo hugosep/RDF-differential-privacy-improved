@@ -24,8 +24,8 @@
     <orderEntry type="library" name="google.guava" level="project" />
     <orderEntry type="library" name="apache.jena.arq" level="project" />
     <orderEntry type="library" name="apache.logging.log4j.core" level="project" />
-    <orderEntry type="library" name="SymJava-1.1.2" level="project" />
     <orderEntry type="library" name="matheclipse-core" level="project" />
     <orderEntry type="library" name="Python 3.8 (RDF-differential-privacy-improved) interpreter library" level="application" />
+    <orderEntry type="library" name="SymJava-1.1.2" level="project" />
   </component>
 </module>
