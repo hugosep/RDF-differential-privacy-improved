@@ -11,6 +11,8 @@ import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matheclipse.core.eval.ExprEvaluator;
+import org.matheclipse.core.interfaces.IExpr;
 import symjava.symbolic.Expr;
 
 import java.io.File;
@@ -71,6 +73,7 @@ public class RunSymbolic {
                         Files.list(Paths.get(queryFile))
                                 .filter(p -> p.toString().endsWith(".rq"))
                                 .iterator();
+
                 logger.info("Running analysis to DIRECTORY: " + queryLocation);
 
                 while (filesPath.hasNext()) {
@@ -151,6 +154,12 @@ public class RunSymbolic {
             if (Helper.isStarQuery(q)) {
                 starQuery = true;
                 elasticStability = x;
+
+                //ISymbol x = F.Dummy("x");
+                //IAST function = F.D(F.Times(F.Sin(x), F.Cos(x)), x);
+                ExprEvaluator util = new ExprEvaluator(false, (short) 100);
+                IExpr result = util.eval("x");
+                logger.info("RESULT:" + result);
 
                 Sensitivity sensitivity = new Sensitivity(1.0, elasticStability);
 

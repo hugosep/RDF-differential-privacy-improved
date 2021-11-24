@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static symjava.symbolic.Symbol.x;
@@ -43,8 +42,7 @@ public class GraphElasticSensitivity {
                                                  double EPSILON,
                                                  DataSource dataSource)
     */
-    public static StarQuery calculateSensitivity(List<StarQuery> listStars, DataSource dataSource)
-            throws ExecutionException, CloneNotSupportedException {
+    public static StarQuery calculateSensitivity(List<StarQuery> listStars, DataSource dataSource) {
 
         StarQuery starQueryFirst = Collections.max(listStars);
         listStars.remove(starQueryFirst);
