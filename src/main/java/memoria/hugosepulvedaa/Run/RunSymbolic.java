@@ -11,9 +11,6 @@ import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.matheclipse.core.eval.ExprEvaluator;
-import org.matheclipse.core.interfaces.IExpr;
-import symjava.symbolic.Expr;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -55,7 +52,7 @@ public class RunSymbolic {
             if (is_endpoint) {
                 dataSource = new EndpointDataSource(endpoint);
             } else {
-                dataSource = new aDataSource(dataFile);
+                dataSource = new HDTDataSource(dataFile);
             }
 
             Path queryLocation = Paths.get(queryFile);

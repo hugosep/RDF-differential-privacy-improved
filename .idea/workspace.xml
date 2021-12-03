@@ -4,39 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2c4b3c1a-d253-4ec3-a949-86e1468970ea" name="Changes" comment=".idea folder for replicate in another PC.">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/lib.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/apfloat-1.10.0-SNAPSHOT.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/hipparchus-clustering-1.8.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/hipparchus-core-1.8.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/hipparchus-fitting-1.8.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/hipparchus-ode-1.8.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/icu4j-68.2.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/logicng-2.0.2.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/matheclipse-api-1.0.0-SNAPSHOT.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/matheclipse-core-1.0.0-SNAPSHOT.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/matheclipse-external-1.0.0-SNAPSHOT.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/matheclipse-frontend-1.0.0-SNAPSHOT.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/matheclipse-io-1.0.0-SNAPSHOT.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DPQuery.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/aDataSource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/matheclipse_core.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="2c4b3c1a-d253-4ec3-a949-86e1468970ea" name="Changes" comment="Replace HDTDataSource with aDataSource.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RDF-differential-privacy-improved.iml" beforeDir="false" afterPath="$PROJECT_DIR$/RDF-differential-privacy-improved.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/matheclipse-core.jar" beforeDir="false" afterPath="$PROJECT_DIR$/lib/fastutil-8.5.2.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Polynomial.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Polynomial.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/HDTDataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/HDTDataSource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/MaxFreqQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/MaxFreqQuery.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/Result.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/Result.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunQuery.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunSymbolic.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunSymbolic.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Sensitivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Sensitivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/StarQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/StarQuery.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/aDataSource.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -287,7 +260,14 @@
       <option name="project" value="LOCAL" />
       <updated>1637723037079</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="New dependencies for use of Function in Symja.&#10;New DPQuery, class for cache.">
+      <created>1638490984736</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1638490984736</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -314,7 +294,9 @@
     <MESSAGE value="Advance in caches:&#10;- Modify Loading function.&#10;- Calling from respective get functions." />
     <MESSAGE value="New class: Polynomial, to avoid to use Symjava." />
     <MESSAGE value=".idea folder for replicate in another PC." />
-    <option name="LAST_COMMIT_MESSAGE" value=".idea folder for replicate in another PC." />
+    <MESSAGE value="New dependencies for use of Function in Symja.&#10;New DPQuery, class for cache." />
+    <MESSAGE value="Replace HDTDataSource with aDataSource." />
+    <option name="LAST_COMMIT_MESSAGE" value="Replace HDTDataSource with aDataSource." />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

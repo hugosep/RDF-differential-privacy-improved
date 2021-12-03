@@ -3,8 +3,6 @@ package memoria.hugosepulvedaa.Run;
 import memoria.hugosepulvedaa.EndpointDataSource;
 import memoria.hugosepulvedaa.HDTDataSource;
 import org.apache.commons.cli.*;
-import org.apache.jena.query.*;
-import org.apache.jena.sparql.core.ResultBinding;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
