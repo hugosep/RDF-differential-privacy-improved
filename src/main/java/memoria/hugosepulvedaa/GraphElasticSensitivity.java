@@ -41,13 +41,14 @@ public class GraphElasticSensitivity {
                                                  double EPSILON,
                                                  DataSource dataSource)
     */
-    public static StarQuery calculateSensitivity(Query originalQuery, List<StarQuery> listStars, DataSource dataSource) {
+    public static StarQuery calculateSensitivity(
+            Query originalQuery, List<StarQuery> listStars, DataSource dataSource) {
 
         StarQuery starQueryFirst = Collections.max(listStars);
         listStars.remove(starQueryFirst);
 
         // calculate sensibility for starQuery
-        //Expr elasticStabilityFirstStar = Expr.valueOf(1); // f(x) = 1
+        // Expr elasticStabilityFirstStar = Expr.valueOf(1); // f(x) = 1
         String elasticStabilityFirstStar = "1";
         starQueryFirst.setElasticStability(elasticStabilityFirstStar);
         StarQuery starQuerySecond;
@@ -69,8 +70,11 @@ public class GraphElasticSensitivity {
         return calculateJoinSensitivity(originalQuery, starQueryFirst, starQuerySecond, dataSource);
     }
 
-    private static StarQuery calculateJoinSensitivity(Query originalQuery,
-                                                      StarQuery starQueryLeft, StarQuery starQueryRight, DataSource hdtDataSource) {
+    private static StarQuery calculateJoinSensitivity(
+            Query originalQuery,
+            StarQuery starQueryLeft,
+            StarQuery starQueryRight,
+            DataSource hdtDataSource) {
 
         List<String> joinVariables = starQueryLeft.getVariables();
         joinVariables.retainAll(starQueryRight.getVariables());
@@ -80,7 +84,8 @@ public class GraphElasticSensitivity {
 
         if (starQueryLeft.getMostPopularValue() == null) {
             mostPopularValueLeft =
-                    mostPopularValue(originalQuery, joinVariables.get(0), starQueryLeft, hdtDataSource);
+                    mostPopularValue(
+                            originalQuery, joinVariables.get(0), starQueryLeft, hdtDataSource);
             logger.info("mostPopularValueLeft: " + mostPopularValueLeft);
             starQueryLeft.setMostPopularValue(mostPopularValueLeft);
 
@@ -90,7 +95,8 @@ public class GraphElasticSensitivity {
 
         if (starQueryRight.getMostPopularValue() == null) {
             mostPopularValueRight =
-                    mostPopularValue(originalQuery, joinVariables.get(0), starQueryRight, hdtDataSource);
+                    mostPopularValue(
+                            originalQuery, joinVariables.get(0), starQueryRight, hdtDataSource);
             logger.info("mostPopularValueRight: " + mostPopularValueRight);
             starQueryRight.setMostPopularValue(mostPopularValueRight);
         } else {
@@ -140,10 +146,15 @@ public class GraphElasticSensitivity {
     /*
      * mostPopularValue(joinVariable a, StarQuery starQuery, DataSource)
      */
-    private static String mostPopularValue(Query originalQuery, String var, StarQuery starQuery, DataSource dataSource) {
+    private static String mostPopularValue(
+            Query originalQuery, String var, StarQuery starQuery, DataSource dataSource) {
         // base case: mp(a,s_1,G)
-        //Expr expr = x;
-        String constant = Integer.toString(dataSource.mostFrequentResult(originalQuery, new MaxFreqQuery(originalQuery, starQuery.toString(), var)));
+        // Expr expr = x;
+        String constant =
+                Integer.toString(
+                        dataSource.mostFrequentResult(
+                                originalQuery,
+                                new MaxFreqQuery(originalQuery, starQuery.toString(), var)));
         /*expr =
                 expr.plus(
                         dataSource.mostFrequentResult(new MaxFreqQuery(starQuery.toString(), var)));

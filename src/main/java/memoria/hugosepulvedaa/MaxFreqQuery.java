@@ -12,6 +12,7 @@ public class MaxFreqQuery {
         query = tp;
         variable = var;
     }
+
     public Query getOriginalQuery() {
         return originalQuery;
     }

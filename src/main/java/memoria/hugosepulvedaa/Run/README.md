@@ -1,6 +1,7 @@
 ### GenerateCountQueries
 
 Generate count queries. Possible input:
+
 ```
 $ -f {input SPARQL query file}
 $ -o {output files}
@@ -9,15 +10,18 @@ $ -o {output files}
 ### RunQueriesParallel
 
 Run asynchronous queries in parallel. Possible input:
+
 ```
 $ -f {input SPARQL query file}
 $ -d {HDT data file}
 $ -c {cores}
 $ -o {output files}
 ```
+
 ### RunQuery
 
 Run SPARQL query. Possible input:
+
 ```
 $ -f {input SPARQL query file}
 $ -d {HDT data file}

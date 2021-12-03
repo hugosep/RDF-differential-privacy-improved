@@ -25,7 +25,8 @@ public class Polynomial {
         binomials.add(binomial);
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return String.join("*", binomials);
     }
 }

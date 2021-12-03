@@ -41,8 +41,7 @@ public class RunSymbolic {
     private static long startTime;
     private static long endTime;
 
-    public static void main(String[] args)
-            throws IOException, ExecutionException {
+    public static void main(String[] args) throws IOException, ExecutionException {
 
         DataSource dataSource;
 
@@ -130,7 +129,7 @@ public class RunSymbolic {
 
             // Expr elasticStability = Expr.valueOf(0);
             String elasticStability = "0";
-            //int k = 1;
+            // int k = 1;
             int k = 0;
 
             Map<String, List<TriplePath>> starQueriesMap = Helper.getStarPatterns(q);
@@ -148,7 +147,7 @@ public class RunSymbolic {
 
             if (Helper.isStarQuery(q)) {
                 starQuery = true;
-                //elasticStability = x;
+                // elasticStability = x;
                 elasticStability = "x";
                 /* ISymbol x = F.Dummy("x");
                 /IAST function = F.D(F.Times(F.Sin(x), F.Cos(x)), x);
@@ -179,7 +178,8 @@ public class RunSymbolic {
                     listStars.add(new StarQuery(tp));
                 }
 
-                StarQuery sq = GraphElasticSensitivity.calculateSensitivity(q, listStars, dataSource);
+                StarQuery sq =
+                        GraphElasticSensitivity.calculateSensitivity(q, listStars, dataSource);
 
                 logger.info("Elastic Stability: " + sq.getElasticStability());
 

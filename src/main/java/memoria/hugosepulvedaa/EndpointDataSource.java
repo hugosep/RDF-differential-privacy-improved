@@ -47,8 +47,10 @@ public class EndpointDataSource implements DataSource {
                                         logger.info(
                                                 "into mostPopularValueCache CacheLoader, loading: "
                                                         + s);
-                                        return getMostFrequentResult(s.getOriginalQuery(),
-                                                s.getQuery(), s.getVariableString());
+                                        return getMostFrequentResult(
+                                                s.getOriginalQuery(),
+                                                s.getQuery(),
+                                                s.getVariableString());
                                     }
                                 });
 
@@ -58,7 +60,7 @@ public class EndpointDataSource implements DataSource {
                         .maximumWeight(1000)
                         .weigher((Weigher<Query, Model>) (k, resultSize) -> k.toString().length())
                         .build(
-                                 new CacheLoader<Query, Model>() {
+                                new CacheLoader<Query, Model>() {
 
                                     @Override
                                     public Model load(Query query) {
@@ -101,7 +103,8 @@ public class EndpointDataSource implements DataSource {
 
         logger.info("constructQuery: " + constructQuery);
 
-        try (QueryExecution qexec = QueryExecutionFactory.sparqlService(dataSource, constructQuery)) {
+        try (QueryExecution qexec =
+                QueryExecutionFactory.sparqlService(dataSource, constructQuery)) {
             Model results = qexec.execConstruct();
             return results;
         }
@@ -164,7 +167,9 @@ public class EndpointDataSource implements DataSource {
             }
 
             logger.info("Construct query for graph size so far: " + construct);
-            count += executeCountQuery("SELECT (COUNT(*) as ?count) WHERE { " + construct + "} ", false);
+            count +=
+                    executeCountQuery(
+                            "SELECT (COUNT(*) as ?count) WHERE { " + construct + "} ", false);
             logger.info("Graph size so far: " + count);
         }
         logger.info("count: " + count);
@@ -177,8 +182,10 @@ public class EndpointDataSource implements DataSource {
     }
 
     @Override
-    public void setMostFreqValueMaps(Query originalQuery,
-            Map<String, List<TriplePath>> starQueriesMap, List<List<String>> triplePatterns) {
+    public void setMostFreqValueMaps(
+            Query originalQuery,
+            Map<String, List<TriplePath>> starQueriesMap,
+            List<List<String>> triplePatterns) {
 
         Map<String, List<Integer>> mapMostFreqValue = new HashMap<>();
         Map<String, List<StarQuery>> mapMostFreqValueStar = new HashMap<>();
@@ -232,7 +239,8 @@ public class EndpointDataSource implements DataSource {
                 logger.info("var: " + var);
 
                 MaxFreqQuery query =
-                        new MaxFreqQuery(originalQuery, Helper.getStarQueryString(starQueryLeft), var);
+                        new MaxFreqQuery(
+                                originalQuery, Helper.getStarQueryString(starQueryLeft), var);
 
                 if (mapMostFreqValue.containsKey(var)) {
                     List<Integer> mostFreqValues = mapMostFreqValue.get(var);

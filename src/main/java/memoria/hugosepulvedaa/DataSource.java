@@ -23,8 +23,10 @@ public interface DataSource {
 
     Long getGraphSizeTriples(List<List<String>> triplePatternsCount);
 
-    void setMostFreqValueMaps(Query originalQuery,
-            Map<String, List<TriplePath>> starQueriesMap, List<List<String>> triplePatterns)
+    void setMostFreqValueMaps(
+            Query originalQuery,
+            Map<String, List<TriplePath>> starQueriesMap,
+            List<List<String>> triplePatterns)
             throws ExecutionException;
 
     Map<String, List<StarQuery>> getMapMostFreqValueStar();
