@@ -26,8 +26,6 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
-import static symjava.symbolic.Symbol.x;
-
 public class RunSymbolic {
 
     private static final Logger logger = LogManager.getLogger(RunSymbolic.class.getName());
@@ -47,7 +45,7 @@ public class RunSymbolic {
     private static long endTime;
 
     public static void main(String[] args)
-            throws IOException, CloneNotSupportedException, ExecutionException {
+            throws IOException, ExecutionException {
 
         DataSource dataSource;
 
@@ -57,7 +55,7 @@ public class RunSymbolic {
             if (is_endpoint) {
                 dataSource = new EndpointDataSource(endpoint);
             } else {
-                dataSource = new HDTDataSource(dataFile);
+                dataSource = new aDataSource(dataFile);
             }
 
             Path queryLocation = Paths.get(queryFile);
@@ -117,7 +115,7 @@ public class RunSymbolic {
             throws IOException, ExecutionException {
 
         // execute COUNT query
-        int countQueryResult = dataSource.executeCountQuery(queryString);
+        int countQueryResult = dataSource.executeCountQuery(queryString, true);
 
         startTime = System.nanoTime();
 
@@ -133,14 +131,14 @@ public class RunSymbolic {
 
         if (element instanceof ElementPathBlock) {
 
-            Expr elasticStability = Expr.valueOf(0);
-
+            // Expr elasticStability = Expr.valueOf(0);
+            String elasticStability = "0";
             //int k = 1;
             int k = 0;
 
             Map<String, List<TriplePath>> starQueriesMap = Helper.getStarPatterns(q);
 
-            dataSource.setMostFreqValueMaps(starQueriesMap, triplePatterns);
+            dataSource.setMostFreqValueMaps(q, starQueriesMap, triplePatterns);
 
             long graphSize = dataSource.getGraphSizeTriples(triplePatterns);
 
@@ -153,14 +151,14 @@ public class RunSymbolic {
 
             if (Helper.isStarQuery(q)) {
                 starQuery = true;
-                elasticStability = x;
-
-                //ISymbol x = F.Dummy("x");
-                //IAST function = F.D(F.Times(F.Sin(x), F.Cos(x)), x);
+                //elasticStability = x;
+                elasticStability = "x";
+                /* ISymbol x = F.Dummy("x");
+                /IAST function = F.D(F.Times(F.Sin(x), F.Cos(x)), x);
                 ExprEvaluator util = new ExprEvaluator(false, (short) 100);
                 IExpr result = util.eval("x");
                 logger.info("RESULT:" + result);
-
+                */
                 Sensitivity sensitivity = new Sensitivity(1.0, elasticStability);
 
                 smoothSensitivity =
@@ -184,7 +182,7 @@ public class RunSymbolic {
                     listStars.add(new StarQuery(tp));
                 }
 
-                StarQuery sq = GraphElasticSensitivity.calculateSensitivity(listStars, dataSource);
+                StarQuery sq = GraphElasticSensitivity.calculateSensitivity(q, listStars, dataSource);
 
                 logger.info("Elastic Stability: " + sq.getElasticStability());
 
@@ -289,7 +287,7 @@ public class RunSymbolic {
             double DELTA,
             boolean evaluation,
             int countQueryResult,
-            Expr elasticStability,
+            String elasticStability,
             long graphSize,
             boolean starQuery,
             DataSource dataSource,

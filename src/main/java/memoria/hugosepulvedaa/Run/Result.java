@@ -17,8 +17,8 @@ public class Result {
     private List<Double> privateResult;
     private double sensitivity;
     private List<Integer> result;
-    private Map<String, List<Integer>> mapMostFreqValue = new HashMap<>();
-    private Map<String, List<StarQuery>> mapMostFreqValueStar = new HashMap<>();
+    private Map<String, List<Integer>> mapMostFreqValue;
+    private Map<String, List<StarQuery>> mapMostFreqValueStar;
     private int maxK;
     private double scale;
     private String elasticStability;
@@ -34,7 +34,7 @@ public class Result {
             List<Integer> result,
             int maxK,
             double scale,
-            Expr elasticStability,
+            String elasticStability,
             long graphSize,
             boolean starQuery,
             Map<String, List<Integer>> mapMostFreqValue,
@@ -48,7 +48,7 @@ public class Result {
         this.result = result;
         this.maxK = maxK;
         this.scale = scale;
-        this.elasticStability = elasticStability.toString();
+        this.elasticStability = elasticStability;
         this.graphSize = graphSize;
         this.starQuery = starQuery;
         this.mapMostFreqValue = mapMostFreqValue;

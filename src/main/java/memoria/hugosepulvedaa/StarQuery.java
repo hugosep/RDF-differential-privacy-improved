@@ -3,7 +3,6 @@ package memoria.hugosepulvedaa;
 import org.apache.jena.graph.Node_URI;
 import org.apache.jena.graph.Node_Variable;
 import org.apache.jena.sparql.core.TriplePath;
-import symjava.symbolic.Expr;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +16,9 @@ public class StarQuery implements Comparable<StarQuery> {
 
     // elastic stability is the formula by which we calculate the sensitivity,
     // only appears when there are more than two star queries
-    private Expr elasticStability;
+    private String elasticStability;
 
-    private Expr mpValue;
+    private String mpValue;
 
     public StarQuery(List<TriplePath> triples) {
         this.triples = triples;
@@ -106,19 +105,19 @@ public class StarQuery implements Comparable<StarQuery> {
         return triples;
     }
 
-    public Expr getElasticStability() {
+    public String getElasticStability() {
         return elasticStability;
     }
 
-    public void setElasticStability(Expr elasticStability) {
+    public void setElasticStability(String elasticStability) {
         this.elasticStability = elasticStability;
     }
 
-    public Expr getMostPopularValue() {
+    public String getMostPopularValue() {
         return mpValue;
     }
 
-    public void setMostPopularValue(Expr mpValue) {
+    public void setMostPopularValue(String mpValue) {
         this.mpValue = mpValue;
     }
 

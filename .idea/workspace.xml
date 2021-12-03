@@ -4,10 +4,39 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2c4b3c1a-d253-4ec3-a949-86e1468970ea" name="Changes" comment="New class: Polynomial, to avoid to use Symjava.">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+    <list default="true" id="2c4b3c1a-d253-4ec3-a949-86e1468970ea" name="Changes" comment=".idea folder for replicate in another PC.">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/lib.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/apfloat-1.10.0-SNAPSHOT.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/hipparchus-clustering-1.8.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/hipparchus-core-1.8.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/hipparchus-fitting-1.8.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/hipparchus-ode-1.8.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/icu4j-68.2.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/logicng-2.0.2.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/matheclipse-api-1.0.0-SNAPSHOT.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/matheclipse-core-1.0.0-SNAPSHOT.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/matheclipse-external-1.0.0-SNAPSHOT.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/matheclipse-frontend-1.0.0-SNAPSHOT.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/matheclipse-io-1.0.0-SNAPSHOT.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DPQuery.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/aDataSource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/matheclipse_core.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RDF-differential-privacy-improved.iml" beforeDir="false" afterPath="$PROJECT_DIR$/RDF-differential-privacy-improved.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/matheclipse-core.jar" beforeDir="false" afterPath="$PROJECT_DIR$/lib/fastutil-8.5.2.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Polynomial.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Polynomial.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/HDTDataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/HDTDataSource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/MaxFreqQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/MaxFreqQuery.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/Result.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/Result.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunQuery.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunSymbolic.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunSymbolic.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Sensitivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Sensitivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/StarQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/StarQuery.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,7 +84,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="TODO_SCOPE" value="All Places" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/lib/SymJava-1.1.2.jar" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/lib" />
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.40574712" />
@@ -72,6 +101,9 @@
       <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\lib" />
       <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\libs" />
       <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\src\main\resources" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="memoria.hugosepulvedaa" />
     </key>
   </component>
   <component name="RunManager">
@@ -248,7 +280,14 @@
       <option name="project" value="LOCAL" />
       <updated>1637721900864</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary=".idea folder for replicate in another PC.">
+      <created>1637723037079</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1637723037079</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -274,7 +313,8 @@
     <MESSAGE value="Improvement smooth sensitivity (start and normal)." />
     <MESSAGE value="Advance in caches:&#10;- Modify Loading function.&#10;- Calling from respective get functions." />
     <MESSAGE value="New class: Polynomial, to avoid to use Symjava." />
-    <option name="LAST_COMMIT_MESSAGE" value="New class: Polynomial, to avoid to use Symjava." />
+    <MESSAGE value=".idea folder for replicate in another PC." />
+    <option name="LAST_COMMIT_MESSAGE" value=".idea folder for replicate in another PC." />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

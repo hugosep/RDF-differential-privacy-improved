@@ -6,7 +6,6 @@
 package memoria.hugosepulvedaa;
 
 import org.apache.jena.query.Query;
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.sparql.core.TriplePath;
 
 import java.util.List;
@@ -16,15 +15,15 @@ import java.util.concurrent.ExecutionException;
 /** @author cbuil */
 public interface DataSource {
 
-    int mostFrequentResult(MaxFreqQuery maxFreqQuery);
+    int mostFrequentResult(Query originalQuery, MaxFreqQuery maxFreqQuery);
 
     long getGraphSize(Query query);
 
-    int executeCountQuery(String queryString);
+    int executeCountQuery(String queryString, boolean principal);
 
     Long getGraphSizeTriples(List<List<String>> triplePatternsCount);
 
-    void setMostFreqValueMaps(
+    void setMostFreqValueMaps(Query originalQuery,
             Map<String, List<TriplePath>> starQueriesMap, List<List<String>> triplePatterns)
             throws ExecutionException;
 

@@ -10,18 +10,18 @@ public class Sensitivity {
     /*
     @s Expr the polinomial for the sensitivity
     */
-    private Expr s;
+    private String s;
     /*
     @maxK int the max iteration needed to get to the sensitivity
     */
     private int maxK;
 
-    public Sensitivity(double sensitivity, Expr s) {
+    public Sensitivity(double sensitivity, String s) {
         this.sensitivity = sensitivity;
         this.s = s;
     }
 
-    public Expr getS() {
+    public String getS() {
         return s;
     }
 

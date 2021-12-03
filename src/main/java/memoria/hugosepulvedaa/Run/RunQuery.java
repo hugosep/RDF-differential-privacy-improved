@@ -94,9 +94,9 @@ public class RunQuery {
                 int result;
 
                 if (cmd.hasOption("f")) {
-                    result = endpointDataSource.executeCountQuery(queryString);
+                    result = endpointDataSource.executeCountQuery(queryString, true);
                 } else {
-                    result = hdtDataSource.executeCountQuery(queryString);
+                    result = hdtDataSource.executeCountQuery(queryString, true);
                 }
 
                 /* int i = 0;

@@ -1,5 +1,6 @@
 package memoria.hugosepulvedaa;
 
+import org.apache.jena.query.Query;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matheclipse.core.eval.ExprEvaluator;
@@ -13,8 +14,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static symjava.symbolic.Symbol.x;
 
 public class GraphElasticSensitivity {
 
@@ -42,18 +41,19 @@ public class GraphElasticSensitivity {
                                                  double EPSILON,
                                                  DataSource dataSource)
     */
-    public static StarQuery calculateSensitivity(List<StarQuery> listStars, DataSource dataSource) {
+    public static StarQuery calculateSensitivity(Query originalQuery, List<StarQuery> listStars, DataSource dataSource) {
 
         StarQuery starQueryFirst = Collections.max(listStars);
         listStars.remove(starQueryFirst);
 
         // calculate sensibility for starQuery
-        Expr elasticStabilityFirstStar = Expr.valueOf(1); // f(x) = 1
+        //Expr elasticStabilityFirstStar = Expr.valueOf(1); // f(x) = 1
+        String elasticStabilityFirstStar = "1";
         starQueryFirst.setElasticStability(elasticStabilityFirstStar);
         StarQuery starQuerySecond;
 
         if (listStars.size() > 1) {
-            starQuerySecond = calculateSensitivity(listStars, dataSource);
+            starQuerySecond = calculateSensitivity(originalQuery, listStars, dataSource);
 
         } else {
             // second star query in the map
@@ -61,25 +61,26 @@ public class GraphElasticSensitivity {
             listStars.remove(starQuerySecond);
 
             // Expr elasticStabilityPrime = x;
-            Expr elasticStabilityPrime = Expr.valueOf(1);
+            // Expr elasticStabilityPrime = Expr.valueOf(1);
+            String elasticStabilityPrime = "1";
             starQuerySecond.setElasticStability(elasticStabilityPrime);
         }
         // now we join, S_G(star2, G)
-        return calculateJoinSensitivity(starQueryFirst, starQuerySecond, dataSource);
+        return calculateJoinSensitivity(originalQuery, starQueryFirst, starQuerySecond, dataSource);
     }
 
-    private static StarQuery calculateJoinSensitivity(
-            StarQuery starQueryLeft, StarQuery starQueryRight, DataSource hdtDataSource) {
+    private static StarQuery calculateJoinSensitivity(Query originalQuery,
+                                                      StarQuery starQueryLeft, StarQuery starQueryRight, DataSource hdtDataSource) {
 
         List<String> joinVariables = starQueryLeft.getVariables();
         joinVariables.retainAll(starQueryRight.getVariables());
 
-        Expr mostPopularValueLeft;
-        Expr mostPopularValueRight;
+        String mostPopularValueLeft;
+        String mostPopularValueRight;
 
         if (starQueryLeft.getMostPopularValue() == null) {
             mostPopularValueLeft =
-                    mostPopularValue(joinVariables.get(0), starQueryLeft, hdtDataSource);
+                    mostPopularValue(originalQuery, joinVariables.get(0), starQueryLeft, hdtDataSource);
             logger.info("mostPopularValueLeft: " + mostPopularValueLeft);
             starQueryLeft.setMostPopularValue(mostPopularValueLeft);
 
@@ -89,32 +90,48 @@ public class GraphElasticSensitivity {
 
         if (starQueryRight.getMostPopularValue() == null) {
             mostPopularValueRight =
-                    mostPopularValue(joinVariables.get(0), starQueryRight, hdtDataSource);
+                    mostPopularValue(originalQuery, joinVariables.get(0), starQueryRight, hdtDataSource);
             logger.info("mostPopularValueRight: " + mostPopularValueRight);
             starQueryRight.setMostPopularValue(mostPopularValueRight);
         } else {
             mostPopularValueRight = starQueryRight.getMostPopularValue();
         }
 
-        Expr stabilityRight = starQueryRight.getElasticStability();
-        Expr stabilityLeft = starQueryLeft.getElasticStability();
+        String stabilityRight = starQueryRight.getElasticStability();
+        String stabilityLeft = starQueryLeft.getElasticStability();
 
         // new stability
-        Func f1 = new Func("f1", mostPopularValueRight.multiply(stabilityLeft));
-        Func f2 = new Func("f2", mostPopularValueLeft.multiply(stabilityRight));
+        Polynomial polynomialf1 = new Polynomial("x", mostPopularValueRight);
+        Polynomial polynomialf2 = new Polynomial("x", mostPopularValueLeft);
+
+        polynomialf1.addBinomial(stabilityLeft);
+        polynomialf2.addBinomial(stabilityRight);
+
+        // Polynomial f1 = new Func("f1", mostPopularValueRight.multiply(stabilityLeft));
+        // Polynomial f2 = new Func("f2", mostPopularValueLeft.multiply(stabilityRight));
 
         // I generate new starQueryPrime
         StarQuery newStarQueryPrime = new StarQuery(starQueryLeft.getTriples());
         newStarQueryPrime.addStarQuery(starQueryRight.getTriples());
 
-        double f1Val = Math.round(f1.toBytecodeFunc().apply(1));
-        double f2Val = Math.round(f2.toBytecodeFunc().apply(1));
+        ExprEvaluator util = new ExprEvaluator(false, (short) 100);
+        IExpr result;
+
+        result = util.eval("Function({x}, " + polynomialf1 + ")[1]");
+
+        // double f1Val = Math.round(f1.toBytecodeFunc().apply(1));
+        // double f2Val = Math.round(f2.toBytecodeFunc().apply(1));
+
+        double f1Val = Math.round(util.evalf(result));
+
+        result = util.eval("Function({x}, " + polynomialf2 + ")[1]");
+        double f2Val = Math.round(util.evalf(result));
 
         if (f1Val > f2Val) {
-            newStarQueryPrime.setElasticStability(f1);
+            newStarQueryPrime.setElasticStability(polynomialf1.toString());
             newStarQueryPrime.setMostPopularValue(mostPopularValueRight);
         } else {
-            newStarQueryPrime.setElasticStability(f2);
+            newStarQueryPrime.setElasticStability(polynomialf2.toString());
             newStarQueryPrime.setMostPopularValue(mostPopularValueLeft);
         }
         return newStarQueryPrime;
@@ -123,29 +140,32 @@ public class GraphElasticSensitivity {
     /*
      * mostPopularValue(joinVariable a, StarQuery starQuery, DataSource)
      */
-    private static Expr mostPopularValue(String var, StarQuery starQuery, DataSource dataSource) {
+    private static String mostPopularValue(Query originalQuery, String var, StarQuery starQuery, DataSource dataSource) {
         // base case: mp(a,s_1,G)
-        Expr expr = x;
-        expr =
+        //Expr expr = x;
+        String constant = Integer.toString(dataSource.mostFrequentResult(originalQuery, new MaxFreqQuery(originalQuery, starQuery.toString(), var)));
+        /*expr =
                 expr.plus(
                         dataSource.mostFrequentResult(new MaxFreqQuery(starQuery.toString(), var)));
-        return expr;
+        */
+        return Polynomial.createBinomial("x", constant);
     }
 
     public static Sensitivity smoothElasticSensitivity(
-            Expr elasticSensitivity, double prevSensitivity, double beta, int k, long graphSize) {
+            String elasticSensitivity, double prevSensitivity, double beta, int k, long graphSize) {
 
         Sensitivity sensitivity = new Sensitivity(prevSensitivity, elasticSensitivity);
 
-        Func f1 = new Func("f1", elasticSensitivity);
+        /*Func f1 = new Func("f1", elasticSensitivity);
         BytecodeFunc func1 = f1.toBytecodeFunc();
+        */
 
-        System.out.println("f1:" + f1);
+        // System.out.println("f1:" + f1);
 
         // this can be minor
         short a = 100;
         ExprEvaluator util = new ExprEvaluator(false, a);
-        IExpr result = util.eval("diff(E^(-" + beta + "*x)*(" + f1 + "),x)");
+        IExpr result = util.eval("diff(E^(-" + beta + "*x)*" + elasticSensitivity + ",x)");
         result = util.eval("NSolve(0==" + result.toString() + ",x)");
         String strResult = result.toString();
 
@@ -189,7 +209,9 @@ public class GraphElasticSensitivity {
         }
 
         for (int i = k; i <= ceilMaxCandidate; i++) {
-            double kPrime = func1.apply(i);
+            result = util.eval("Function({x}, " + elasticSensitivity + ")[1]");
+            // double kPrime = func1.apply(i);
+            double kPrime = util.evalf(result);
             double smoothSensitivity = Math.exp(-i * beta) * kPrime;
 
             if (smoothSensitivity > prevSensitivity) {
@@ -205,7 +227,7 @@ public class GraphElasticSensitivity {
     }
 
     public static Sensitivity smoothElasticSensitivityStar(
-            Expr elasticSensitivity, Sensitivity prevSensitivity, double beta, int k) {
+            String elasticSensitivity, Sensitivity prevSensitivity, double beta, int k) {
 
         /* OPTIMIZATION
          * It doesn't make sense iterate for f(x)=E^(-beta*x), because the function is a decreasing

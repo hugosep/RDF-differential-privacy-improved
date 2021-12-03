@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
-public class HDTDataSource implements DataSource {
+public class HDTDataSource {
 
     private static final Logger logger = LogManager.getLogger(HDTDataSource.class.getName());
 
@@ -38,12 +38,12 @@ public class HDTDataSource implements DataSource {
     private static final Map<String, List<Integer>> mapMostFreqValue = new HashMap<>();
     private static final Map<String, List<StarQuery>> mapMostFreqValueStar = new HashMap<>();
 
-    @Override
+    //@Override
     public Map<String, List<Integer>> getMapMostFreqValue() {
         return mapMostFreqValue;
     }
 
-    @Override
+    //@Override
     public Map<String, List<StarQuery>> getMapMostFreqValueStar() {
         return mapMostFreqValueStar;
     }
@@ -131,7 +131,7 @@ public class HDTDataSource implements DataSource {
         }
     }
 
-    @Override
+    //@Override
     public long getGraphSize(Query query) {
         try (QueryExecution qexec = QueryExecutionFactory.create(query, triples)) {
             Model results = qexec.execConstruct();
@@ -141,8 +141,8 @@ public class HDTDataSource implements DataSource {
         }
     }
 
-    @Override
-    public int executeCountQuery(String queryString) {
+    //@Override
+    public int executeCountQuery(String queryString, boolean principal) {
         Query query = QueryFactory.create(queryString);
         logger.info("count query: " + queryString);
         /*ResultSet results = executeQuery(query);
@@ -152,13 +152,13 @@ public class HDTDataSource implements DataSource {
         */
 
         // INFINITE RECURSION
-        int countResult = executeCountQuery(queryString);
+        int countResult = executeCountQuery(queryString, false);
         logger.info("count query result (dataset): " + countResult);
         // return countResult;
         return countResult;
     }
 
-    @Override
+    //@Override
     public Long getGraphSizeTriples(List<List<String>> triplePatternsCount) {
         long count = 0;
 
@@ -171,14 +171,14 @@ public class HDTDataSource implements DataSource {
             }
 
             logger.info("construct query for graph size so far: " + construct);
-            count += executeCountQuery("SELECT (COUNT(*) as ?count) WHERE {" + construct + "}");
+            count += executeCountQuery("SELECT (COUNT(*) as ?count) WHERE {" + construct + "}", false);
             logger.info("graph size so far: " + count);
         }
         return count;
     }
 
-    @Override
-    public void setMostFreqValueMaps(
+    //@Override
+    public void setMostFreqValueMaps(Query originalQuery,
             Map<String, List<TriplePath>> starQueriesMap, List<List<String>> triplePatterns)
             throws ExecutionException {
 
@@ -232,7 +232,7 @@ public class HDTDataSource implements DataSource {
             for (String var : varStrings) {
 
                 MaxFreqQuery query =
-                        new MaxFreqQuery(Helper.getStarQueryString(starQueryLeft), var);
+                        new MaxFreqQuery(originalQuery, Helper.getStarQueryString(starQueryLeft), var);
 
                 if (mapMostFreqValue.containsKey(var)) {
                     List<Integer> mostFreqValues = mapMostFreqValue.get(var);
@@ -257,7 +257,7 @@ public class HDTDataSource implements DataSource {
         }
     }
 
-    @Override
+    //@Override
     public int mostFrequentResult(MaxFreqQuery maxFreqQuery) {
 
         try {
