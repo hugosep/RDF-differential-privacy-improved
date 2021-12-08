@@ -1,11 +1,10 @@
 package memoria.hugosepulvedaa.Run;
 
 import memoria.hugosepulvedaa.*;
-import memoria.hugosepulvedaa.utils.Helper;
+import memoria.hugosepulvedaa.DPQuery;
 import org.apache.commons.cli.*;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
@@ -21,7 +20,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.SecureRandom;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 public class RunSymbolic {
 
@@ -41,7 +39,7 @@ public class RunSymbolic {
     private static long startTime;
     private static long endTime;
 
-    public static void main(String[] args) throws IOException, ExecutionException {
+    public static void main(String[] args) throws IOException {
 
         DataSource dataSource;
 
@@ -49,7 +47,7 @@ public class RunSymbolic {
 
         try {
             if (is_endpoint) {
-                dataSource = new EndpointDataSource(endpoint);
+                dataSource = new EndpointDataSource(endpoint, EPSILON);
             } else {
                 dataSource = new HDTDataSource(dataFile);
             }
@@ -108,7 +106,7 @@ public class RunSymbolic {
             String outputFile,
             boolean evaluation,
             double EPSILON)
-            throws IOException, ExecutionException {
+            throws IOException {
 
         // execute COUNT query
         int countQueryResult = dataSource.executeCountQuery(queryString, true);
@@ -116,79 +114,21 @@ public class RunSymbolic {
         startTime = System.nanoTime();
 
         Query q = QueryFactory.create(queryString);
-
-        List<List<String>> triplePatterns = new ArrayList<>();
         ElementGroup queryPattern = (ElementGroup) q.getQueryPattern();
         List<Element> elementList = queryPattern.getElements();
 
         Sensitivity smoothSensitivity;
         Element element = elementList.get(0);
-        boolean starQuery = false;
 
         if (element instanceof ElementPathBlock) {
 
-            // Expr elasticStability = Expr.valueOf(0);
-            String elasticStability = "0";
-            // int k = 1;
-            int k = 0;
-
-            Map<String, List<TriplePath>> starQueriesMap = Helper.getStarPatterns(q);
-
-            dataSource.setMostFreqValueMaps(q, starQueriesMap, triplePatterns);
-
-            long graphSize = dataSource.getGraphSizeTriples(triplePatterns);
-
-            // esta demas, ya que en la funcion se agrega al logger
-            logger.info("graph size: " + graphSize);
+            DPQuery dpQuery = dataSource.getDPQuery(q);
 
             // delta parameter: use 1/n^2, with n = size of the data in the query
-            double DELTA = 1 / Math.pow(graphSize, 2);
-            double beta = EPSILON / (2 * Math.log(2 / DELTA));
+            double DELTA = dpQuery.getDelta();
+            String elasticStability = dpQuery.getElasticStability();
 
-            if (Helper.isStarQuery(q)) {
-                starQuery = true;
-                // elasticStability = x;
-                elasticStability = "x";
-                /* ISymbol x = F.Dummy("x");
-                /IAST function = F.D(F.Times(F.Sin(x), F.Cos(x)), x);
-                ExprEvaluator util = new ExprEvaluator(false, (short) 100);
-                IExpr result = util.eval("x");
-                logger.info("RESULT:" + result);
-                */
-                Sensitivity sensitivity = new Sensitivity(1.0, elasticStability);
-
-                smoothSensitivity =
-                        GraphElasticSensitivity.smoothElasticSensitivityStar(
-                                elasticStability, sensitivity, beta, k);
-
-                logger.info(
-                        "Star query (smooth) sensitivity: " + smoothSensitivity.getSensitivity());
-
-            } else {
-                /* elasticStability = GraphElasticSensitivity.calculateSensitivity(
-                                            k,
-                                            starQueriesMap,
-                                            EPSILON,
-                                            hdtDataSource);
-                */
-
-                List<StarQuery> listStars = new ArrayList<>();
-
-                for (List<TriplePath> tp : starQueriesMap.values()) {
-                    listStars.add(new StarQuery(tp));
-                }
-
-                StarQuery sq =
-                        GraphElasticSensitivity.calculateSensitivity(q, listStars, dataSource);
-
-                logger.info("Elastic Stability: " + sq.getElasticStability());
-
-                smoothSensitivity =
-                        GraphElasticSensitivity.smoothElasticSensitivity(
-                                sq.getElasticStability(), 0, beta, k, graphSize);
-
-                logger.info("Path Smooth Sensitivity: " + smoothSensitivity.getSensitivity());
-            }
+            smoothSensitivity = dpQuery.getSmoothSensitivity();
 
             double scale = 2 * smoothSensitivity.getSensitivity() / EPSILON;
 
@@ -200,8 +140,8 @@ public class RunSymbolic {
                     evaluation,
                     countQueryResult,
                     elasticStability,
-                    graphSize,
-                    starQuery,
+                    dpQuery.getGraphSizeTriples(),
+                    dpQuery.isStarQuery(),
                     dataSource,
                     smoothSensitivity,
                     outputFile);

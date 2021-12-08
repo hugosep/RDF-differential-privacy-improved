@@ -15,13 +15,15 @@ import java.util.concurrent.ExecutionException;
 /** @author cbuil */
 public interface DataSource {
 
+    DPQuery getDPQuery(Query query);
+
     int mostFrequentResult(Query originalQuery, MaxFreqQuery maxFreqQuery);
 
     long getGraphSize(Query query);
 
     int executeCountQuery(String queryString, boolean principal);
 
-    Long getGraphSizeTriples(List<List<String>> triplePatternsCount);
+    Long getGraphSizeTriples(Query query);
 
     void setMostFreqValueMaps(
             Query originalQuery,

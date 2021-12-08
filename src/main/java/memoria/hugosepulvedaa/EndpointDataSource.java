@@ -22,15 +22,109 @@ public class EndpointDataSource implements DataSource {
     private static final Logger logger = LogManager.getLogger(EndpointDataSource.class.getName());
     private final String dataSource;
     private static LoadingCache<MaxFreqQuery, Integer> mostFrequentResultCache;
-    private static LoadingCache<String, Integer> countQueriesCache;
-    private static LoadingCache<Query, Model> graphModelsCache;
-    private static LoadingCache<List<List<String>>, Long> graphSizeTriplesCache;
+    private static LoadingCache<Query, DPQuery> DPQueriesCache;
     private static final Map<String, List<Integer>> mapMostFreqValue = new HashMap<>();
     private static final Map<String, List<StarQuery>> mapMostFreqValueStar = new HashMap<>();
+    private double EPSILON;
 
-    public EndpointDataSource(String endpoint) {
+    public EndpointDataSource(String endpoint, double EPSILON) {
 
         dataSource = endpoint;
+        this.EPSILON = EPSILON;
+
+        DPQueriesCache =
+                CacheBuilder.newBuilder()
+                        .recordStats()
+                        .maximumWeight(100000)
+                        .weigher(
+                                (Weigher<Query, DPQuery>)
+                                        (k, resultSize) -> k.getQueryPattern().toString().length())
+                        .build(
+                                new CacheLoader<Query, DPQuery>() {
+
+                                    @Override
+                                    public DPQuery load(Query key) {
+                                        logger.info("into DPQueries CacheLoader, loading: " + key);
+                                        DPQuery dpQuery = new DPQuery();
+
+                                        dpQuery.setModel(executeConstructQuery(key));
+
+                                        List<List<String>> triplePatterns = new ArrayList<>();
+
+                                        Map<String, List<TriplePath>> starQueriesMap =
+                                                Helper.getStarPatterns(key);
+
+                                        setMostFreqValueMaps(key, starQueriesMap, triplePatterns);
+
+                                        long graphSize = calculateGraphSizeTriples(triplePatterns);
+
+                                        dpQuery.setGraphSizeTriples(graphSize);
+
+                                        double DELTA = 1 / Math.pow(graphSize, 2);
+                                        double beta = EPSILON / (2 * Math.log(2 / DELTA));
+
+                                        String elasticStability = "0";
+                                        int k = 0;
+
+                                        Sensitivity smoothSensitivity;
+
+                                        dpQuery.setIsStarQuery(Helper.isStarQuery(key));
+
+                                        if (dpQuery.isStarQuery()) {
+                                            elasticStability = "x";
+
+                                            Sensitivity sensitivity =
+                                                    new Sensitivity(1.0, elasticStability);
+
+                                            smoothSensitivity =
+                                                    GraphElasticSensitivity
+                                                            .smoothElasticSensitivityStar(
+                                                                    elasticStability,
+                                                                    sensitivity,
+                                                                    beta,
+                                                                    k);
+
+                                            logger.info(
+                                                    "Star query (smooth) sensitivity: "
+                                                            + smoothSensitivity.getSensitivity());
+                                            dpQuery.setElasticStability(elasticStability);
+
+                                        } else {
+                                            List<StarQuery> listStars = new ArrayList<>();
+
+                                            for (List<TriplePath> tp : starQueriesMap.values()) {
+                                                listStars.add(new StarQuery(tp));
+                                            }
+
+                                            StarQuery sq =
+                                                    GraphElasticSensitivity.calculateSensitivity(
+                                                            key,
+                                                            listStars,
+                                                            EndpointDataSource.this);
+
+                                            logger.info(
+                                                    "Elastic Stability: "
+                                                            + sq.getElasticStability());
+
+                                            smoothSensitivity =
+                                                    GraphElasticSensitivity
+                                                            .smoothElasticSensitivity(
+                                                                    sq.getElasticStability(),
+                                                                    0,
+                                                                    beta,
+                                                                    k,
+                                                                    graphSize);
+
+                                            logger.info(
+                                                    "Path Smooth Sensitivity: "
+                                                            + smoothSensitivity.getSensitivity());
+                                            dpQuery.setElasticStability(sq.getElasticStability());
+                                        }
+                                        dpQuery.setSmoothSensitivity(smoothSensitivity);
+
+                                        return dpQuery;
+                                    }
+                                });
 
         mostFrequentResultCache =
                 CacheBuilder.newBuilder()
@@ -53,47 +147,15 @@ public class EndpointDataSource implements DataSource {
                                                 s.getVariableString());
                                     }
                                 });
+    }
 
-        graphModelsCache =
-                CacheBuilder.newBuilder()
-                        .recordStats()
-                        .maximumWeight(1000)
-                        .weigher((Weigher<Query, Model>) (k, resultSize) -> k.toString().length())
-                        .build(
-                                new CacheLoader<Query, Model>() {
-
-                                    @Override
-                                    public Model load(Query query) {
-                                        logger.debug(
-                                                "into graphSizeCache CacheLoader, loading: "
-                                                        + query);
-                                        return executeConstructQuery(query);
-                                    }
-                                });
-
-        graphSizeTriplesCache =
-                CacheBuilder.newBuilder()
-                        .recordStats()
-                        .maximumWeight(1000)
-                        .weigher(
-                                (Weigher<List<List<String>>, Long>)
-                                        (k, resultSize) -> k.toString().length())
-                        .build(
-                                new CacheLoader<List<List<String>>, Long>() {
-
-                                    @Override
-                                    public Long load(List<List<String>> triplePatternsCount) {
-                                        logger.debug(
-                                                "into graphSizeCacheTriples CacheLoader, loading: "
-                                                        + triplePatternsCount);
-                                        return calculateGraphSizeTriples(triplePatternsCount);
-                                    }
-                                });
+    public DPQuery getDPQuery(Query query) {
+        return (DPQueriesCache.getUnchecked(query));
     }
 
     @Override
     public long getGraphSize(Query query) {
-        return (graphModelsCache.getUnchecked(query).size());
+        return (DPQueriesCache.getUnchecked(query).getModel().size());
     }
 
     public Model executeConstructQuery(Query query) {
@@ -115,15 +177,16 @@ public class EndpointDataSource implements DataSource {
 
         Query query = QueryFactory.create(queryString);
 
-        /* no entiendo por que esta esto
-        if (queryString.contains("http://www.wikidata.org/prop/direct/P31") &&
+        // no entiendo por que esta esto
+        /*if (queryString.contains("http://www.wikidata.org/prop/direct/P31") &&
                 (queryString.lastIndexOf('?') != queryString.indexOf('?'))) {
             return 85869721;
         }*/
+
         QueryExecution qexec;
 
         try {
-            Model modelQuery = graphModelsCache.get(query);
+            Model modelQuery = DPQueriesCache.get(query).getModel();
             qexec = QueryExecutionFactory.create(query, modelQuery);
 
         } catch (ExecutionException e) {
@@ -148,14 +211,13 @@ public class EndpointDataSource implements DataSource {
        @description Sum all COUNTs of every generated query.
     */
     @Override
-    public Long getGraphSizeTriples(List<List<String>> triplePatternsCount) {
-        return (graphSizeTriplesCache.getUnchecked(triplePatternsCount));
+    public Long getGraphSizeTriples(Query query) {
+        return (DPQueriesCache.getUnchecked(query).getGraphSizeTriples());
     }
 
     public Long calculateGraphSizeTriples(List<List<String>> triplePatternsCount) {
 
         long count = 0L;
-        System.out.println("triplePatternsCount:" + triplePatternsCount);
 
         // triplePatternsCount has all triples generated by setMostFreqValueMaps method
         for (List<String> star : triplePatternsCount) {
@@ -192,6 +254,7 @@ public class EndpointDataSource implements DataSource {
 
         // EDITED
         logger.info("StarQueriesMap: " + starQueriesMap);
+        logger.info("triplePatterns: " + triplePatterns);
 
         for (String key : starQueriesMap.keySet()) {
 
@@ -256,8 +319,6 @@ public class EndpointDataSource implements DataSource {
 
                 } else {
                     List<Integer> mostFreqValues = new ArrayList<>();
-                    logger.info("Query: " + query.getQuery());
-                    logger.info("Variable: " + query.getVariableString());
 
                     mostFreqValues.add(mostFrequentResultCache.getUnchecked(query));
                     mapMostFreqValue.put(var, mostFreqValues);
@@ -306,7 +367,7 @@ public class EndpointDataSource implements DataSource {
         QueryExecution qexec;
 
         try {
-            Model modelQuery = graphModelsCache.get(originalQuery);
+            Model modelQuery = DPQueriesCache.get(originalQuery).getModel();
             qexec = QueryExecutionFactory.create(query, modelQuery);
 
         } catch (ExecutionException e) {
