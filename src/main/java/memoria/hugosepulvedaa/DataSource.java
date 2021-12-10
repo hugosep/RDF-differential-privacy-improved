@@ -6,8 +6,10 @@
 package memoria.hugosepulvedaa;
 
 import org.apache.jena.query.Query;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.core.TriplePath;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -17,15 +19,19 @@ public interface DataSource {
 
     DPQuery getDPQuery(Query query);
 
-    int mostFrequentResult(Query originalQuery, MaxFreqQuery maxFreqQuery);
-
     long getGraphSize(Query query);
 
     int executeCountQuery(String queryString, boolean principal);
 
     Long getGraphSizeTriples(Query query);
 
+    int getMostFrequentResult(String starQuery, String variableName);
+
+    int mostFrequentResult(MaxFreqQuery maxFreqQuery);
+
     void setMostFreqValueMaps(
+            Model model,
+            HashMap<MaxFreqQuery, Integer> mostFrequentResults,
             Query originalQuery,
             Map<String, List<TriplePath>> starQueriesMap,
             List<List<String>> triplePatterns)

@@ -15,14 +15,15 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 
 /** @author cbuil */
 public class EndpointDataSource implements DataSource {
 
     private static final Logger logger = LogManager.getLogger(EndpointDataSource.class.getName());
     private final String dataSource;
-    private static LoadingCache<MaxFreqQuery, Integer> mostFrequentResultCache;
     private static LoadingCache<Query, DPQuery> DPQueriesCache;
+    private final LoadingCache<MaxFreqQuery, Integer> mostFrequentResultCache;
     private static final Map<String, List<Integer>> mapMostFreqValue = new HashMap<>();
     private static final Map<String, List<StarQuery>> mapMostFreqValueStar = new HashMap<>();
     private double EPSILON;
@@ -38,25 +39,34 @@ public class EndpointDataSource implements DataSource {
                         .maximumWeight(100000)
                         .weigher(
                                 (Weigher<Query, DPQuery>)
-                                        (k, resultSize) -> k.getQueryPattern().toString().length())
+                                        (k, v) -> (int) v.getExecutionTime())
                         .build(
                                 new CacheLoader<Query, DPQuery>() {
 
                                     @Override
                                     public DPQuery load(Query key) {
                                         logger.info("into DPQueries CacheLoader, loading: " + key);
+
                                         DPQuery dpQuery = new DPQuery();
 
-                                        dpQuery.setModel(executeConstructQuery(key));
+                                        long startTime = System.nanoTime();
 
+                                        dpQuery.setModel(executeConstructQuery(key));
                                         List<List<String>> triplePatterns = new ArrayList<>();
 
                                         Map<String, List<TriplePath>> starQueriesMap =
                                                 Helper.getStarPatterns(key);
 
-                                        setMostFreqValueMaps(key, starQueriesMap, triplePatterns);
+                                        setMostFreqValueMaps(
+                                                dpQuery.getModel(),
+                                                dpQuery.getMostFrequentResults(),
+                                                key,
+                                                starQueriesMap,
+                                                triplePatterns);
 
-                                        long graphSize = calculateGraphSizeTriples(triplePatterns);
+                                        long graphSize =
+                                                calculateGraphSizeTriples(
+                                                        dpQuery.getModel(), triplePatterns);
 
                                         dpQuery.setGraphSizeTriples(graphSize);
 
@@ -98,9 +108,9 @@ public class EndpointDataSource implements DataSource {
 
                                             StarQuery sq =
                                                     GraphElasticSensitivity.calculateSensitivity(
-                                                            key,
-                                                            listStars,
-                                                            EndpointDataSource.this);
+                                                            EndpointDataSource.this,
+                                                            dpQuery.getMostFrequentResults(),
+                                                            listStars);
 
                                             logger.info(
                                                     "Elastic Stability: "
@@ -120,37 +130,39 @@ public class EndpointDataSource implements DataSource {
                                                             + smoothSensitivity.getSensitivity());
                                             dpQuery.setElasticStability(sq.getElasticStability());
                                         }
+                                        logger.info("SmoothSensitivity:" + smoothSensitivity);
                                         dpQuery.setSmoothSensitivity(smoothSensitivity);
 
+                                        // stopTime
+                                        long endTime = System.nanoTime();
+                                        long duration = (endTime - startTime);
+                                        double durationInSeconds = (double) (duration / 1000000000);
+                                        logger.info("Time: " + durationInSeconds + " seconds");
+                                        dpQuery.setExecutionTime(durationInSeconds);
                                         return dpQuery;
                                     }
                                 });
 
-        mostFrequentResultCache =
-                CacheBuilder.newBuilder()
-                        .recordStats()
-                        .maximumWeight(100000)
-                        .weigher(
-                                (Weigher<MaxFreqQuery, Integer>)
-                                        (k, resultSize) -> k.getQuerySize())
-                        .build(
-                                new CacheLoader<MaxFreqQuery, Integer>() {
-
-                                    @Override
-                                    public Integer load(MaxFreqQuery s) {
-                                        logger.info(
-                                                "into mostPopularValueCache CacheLoader, loading: "
-                                                        + s);
-                                        return getMostFrequentResult(
-                                                s.getOriginalQuery(),
-                                                s.getQuery(),
-                                                s.getVariableString());
-                                    }
-                                });
+        mostFrequentResultCache = CacheBuilder.newBuilder().recordStats()
+                .maximumWeight(100000)
+                .weigher(new Weigher<MaxFreqQuery, Integer>() {
+                    public int weigh(MaxFreqQuery k, Integer resultSize) {
+                        return k.getQuerySize();
+                    }
+                }).build(new CacheLoader<MaxFreqQuery, Integer>() {
+                    @Override
+                    public Integer load(MaxFreqQuery s) throws Exception {
+                        logger.debug(
+                                "into mostPopularValueCache CacheLoader, loading: "
+                                        + s.toString());
+                        return getMostFrequentResult(s.getQuery(),
+                                s.getVariableString());
+                    }
+                });
     }
 
-    public DPQuery getDPQuery(Query query) {
-        return (DPQueriesCache.getUnchecked(query));
+    public DPQuery getDPQuery(Query key) {
+        return DPQueriesCache.getUnchecked(key);
     }
 
     @Override
@@ -167,8 +179,7 @@ public class EndpointDataSource implements DataSource {
 
         try (QueryExecution qexec =
                 QueryExecutionFactory.sparqlService(dataSource, constructQuery)) {
-            Model results = qexec.execConstruct();
-            return results;
+            return qexec.execConstruct();
         }
     }
 
@@ -178,20 +189,38 @@ public class EndpointDataSource implements DataSource {
         Query query = QueryFactory.create(queryString);
 
         // no entiendo por que esta esto
-        /*if (queryString.contains("http://www.wikidata.org/prop/direct/P31") &&
+        if (queryString.contains("http://www.wikidata.org/prop/direct/P31") &&
                 (queryString.lastIndexOf('?') != queryString.indexOf('?'))) {
             return 85869721;
-        }*/
-
-        QueryExecution qexec;
-
-        try {
-            Model modelQuery = DPQueriesCache.get(query).getModel();
-            qexec = QueryExecutionFactory.create(query, modelQuery);
-
-        } catch (ExecutionException e) {
-            qexec = QueryExecutionFactory.sparqlService(dataSource, query);
         }
+
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(dataSource, query);
+
+        ResultSet results = qexec.execSelect();
+        QuerySolution soln = results.nextSolution();
+
+        logger.info("Count query executed... ");
+
+        qexec.close();
+
+        RDFNode x = soln.get(soln.varNames().next());
+        int countResult = x.asLiteral().getInt();
+
+        logger.info("Count query result (endpoint): " + countResult);
+        return countResult;
+    }
+
+    public int executeCountQueryInternal(Model model, String queryString) {
+
+        Query query = QueryFactory.create(queryString);
+
+        // no entiendo por que esta esto
+        if (queryString.contains("http://www.wikidata.org/prop/direct/P31") &&
+                (queryString.lastIndexOf('?') != queryString.indexOf('?'))) {
+            return 85869721;
+        }
+
+        QueryExecution qexec = QueryExecutionFactory.create(query, model);
 
         ResultSet results = qexec.execSelect();
         QuerySolution soln = results.nextSolution();
@@ -215,7 +244,7 @@ public class EndpointDataSource implements DataSource {
         return (DPQueriesCache.getUnchecked(query).getGraphSizeTriples());
     }
 
-    public Long calculateGraphSizeTriples(List<List<String>> triplePatternsCount) {
+    public Long calculateGraphSizeTriples(Model model, List<List<String>> triplePatternsCount) {
 
         long count = 0L;
 
@@ -230,8 +259,8 @@ public class EndpointDataSource implements DataSource {
 
             logger.info("Construct query for graph size so far: " + construct);
             count +=
-                    executeCountQuery(
-                            "SELECT (COUNT(*) as ?count) WHERE { " + construct + "} ", false);
+                    executeCountQueryInternal(
+                            model, "SELECT (COUNT(*) as ?count) WHERE { " + construct + "} ");
             logger.info("Graph size so far: " + count);
         }
         logger.info("count: " + count);
@@ -239,12 +268,21 @@ public class EndpointDataSource implements DataSource {
     }
 
     @Override
-    public int mostFrequentResult(Query originalQuery, MaxFreqQuery maxFreqQuery) {
-        return mostFrequentResultCache.getUnchecked(maxFreqQuery);
+    public int mostFrequentResult(MaxFreqQuery maxFreqQuery)
+    {
+        try {
+            return this.mostFrequentResultCache.get(maxFreqQuery);
+
+        } catch (ExecutionException ex) {
+            java.util.logging.Logger.getLogger(EndpointDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            return -1;
+        }
     }
 
     @Override
     public void setMostFreqValueMaps(
+            Model model,
+            HashMap<MaxFreqQuery, Integer> mostFrequentResults,
             Query originalQuery,
             Map<String, List<TriplePath>> starQueriesMap,
             List<List<String>> triplePatterns) {
@@ -302,15 +340,19 @@ public class EndpointDataSource implements DataSource {
                 logger.info("var: " + var);
 
                 MaxFreqQuery query =
-                        new MaxFreqQuery(
-                                originalQuery, Helper.getStarQueryString(starQueryLeft), var);
+                        new MaxFreqQuery(Helper.getStarQueryString(starQueryLeft), var);
 
                 if (mapMostFreqValue.containsKey(var)) {
                     List<Integer> mostFreqValues = mapMostFreqValue.get(var);
                     List<StarQuery> mostFreqValuesStar = mapMostFreqValueStar.get(var);
 
                     if (!mostFreqValues.isEmpty()) {
-                        mostFreqValues.add(mostFrequentResultCache.getUnchecked(query));
+                        mostFrequentResults.computeIfAbsent(
+                                query,
+                                k ->
+                                        getMostFrequentResult(k.getQuery(), k.getVariableString()));
+
+                        mostFreqValues.add(mostFrequentResults.get(query));
                         mapMostFreqValue.put(var, mostFreqValues);
 
                         mostFreqValuesStar.add(new StarQuery(starQueryLeft));
@@ -319,8 +361,10 @@ public class EndpointDataSource implements DataSource {
 
                 } else {
                     List<Integer> mostFreqValues = new ArrayList<>();
-
-                    mostFreqValues.add(mostFrequentResultCache.getUnchecked(query));
+                    mostFrequentResults.computeIfAbsent(
+                            query,
+                            k -> getMostFrequentResult(k.getQuery(), k.getVariableString()));
+                    mostFreqValues.add(mostFrequentResults.get(query));
                     mapMostFreqValue.put(var, mostFreqValues);
 
                     List<StarQuery> mostFreqValuesStar = new ArrayList<>();
@@ -342,7 +386,8 @@ public class EndpointDataSource implements DataSource {
         return mapMostFreqValue;
     }
 
-    private int getMostFrequentResult(Query originalQuery, String starQuery, String variableName) {
+    @Override
+    public int getMostFrequentResult(String starQuery, String variableName) {
 
         variableName = variableName.replace("“", "").replace("”", "");
 
@@ -364,15 +409,15 @@ public class EndpointDataSource implements DataSource {
         logger.info("query at getMostFrequentResult: " + maxFreqQueryString);
 
         Query query = QueryFactory.create(maxFreqQueryString);
-        QueryExecution qexec;
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(dataSource, query);
 
-        try {
+        /*try {
             Model modelQuery = DPQueriesCache.get(originalQuery).getModel();
             qexec = QueryExecutionFactory.create(query, modelQuery);
 
         } catch (ExecutionException e) {
             qexec = QueryExecutionFactory.sparqlService(dataSource, query);
-        }
+        }*/
 
         ResultSet results = qexec.execSelect();
 

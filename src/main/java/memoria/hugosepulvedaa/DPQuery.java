@@ -2,6 +2,8 @@ package memoria.hugosepulvedaa;
 
 import org.apache.jena.rdf.model.Model;
 
+import java.util.HashMap;
+
 public class DPQuery {
     private Model model;
     private Long graphSizeTriples;
@@ -11,8 +13,28 @@ public class DPQuery {
     private double delta;
     private String elasticStability;
     private Sensitivity smoothSensitivity;
+    private HashMap<MaxFreqQuery, Integer> mostFrequentResults;
+    private double executionTime;
 
-    DPQuery() {}
+    public double getExecutionTime() {
+        return this.executionTime;
+    }
+
+    public void setExecutionTime(double executionTime) {
+        this.executionTime = executionTime;
+    }
+
+    public HashMap<MaxFreqQuery, Integer> getMostFrequentResults() {
+        return mostFrequentResults;
+    }
+
+    public Integer getMostFrequentResult(MaxFreqQuery maxFreqQuery) {
+        return mostFrequentResults.get(maxFreqQuery);
+    }
+
+    DPQuery() {
+        mostFrequentResults = new HashMap<>();
+    }
 
     public Sensitivity getSmoothSensitivity() {
         return smoothSensitivity;

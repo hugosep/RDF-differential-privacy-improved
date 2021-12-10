@@ -21,9 +21,17 @@ import org.rdfhdt.hdtjena.NodeDictionary;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 
 /** @author cbuil */
 public class HDTDataSource implements DataSource {
+
+    private static final Logger logger = LogManager.getLogger(HDTDataSource.class.getName());
+    private static LoadingCache<Query, DPQuery> DPQueriesCache;
+    private final LoadingCache<MaxFreqQuery, Integer> mostFrequentResultCache;
+    private static final Map<String, List<Integer>> mapMostFreqValue = new HashMap<>();
+    private static final Map<String, List<StarQuery>> mapMostFreqValueStar = new HashMap<>();
+    private double EPSILON;
 
     final HDT dataSource;
     final NodeDictionary dictionary;
@@ -31,83 +39,140 @@ public class HDTDataSource implements DataSource {
     HDTGraph graph;
     Model triples;
 
-    private static final Logger logger = LogManager.getLogger(HDTDataSource.class.getName());
-    private static LoadingCache<MaxFreqQuery, Integer> mostFrequentResultCache;
-    private static LoadingCache<String, Integer> countQueriesCache;
-    private static LoadingCache<Query, Model> graphModelsCache;
-    private static LoadingCache<List<List<String>>, Long> graphSizeTriplesCache;
-    private static final Map<String, List<Integer>> mapMostFreqValue = new HashMap<>();
-    private static final Map<String, List<StarQuery>> mapMostFreqValueStar = new HashMap<>();
+    public HDTDataSource(String hdtFile, double EPSILON) throws IOException {
 
-    public HDTDataSource(String hdtFile) throws IOException {
+        this.EPSILON = EPSILON;
 
         dataSource = HDTManager.mapIndexedHDT(hdtFile, null);
         dictionary = new NodeDictionary(dataSource.getDictionary());
         graph = new HDTGraph(dataSource);
         triples = ModelFactory.createModelForGraph(graph);
 
-        mostFrequentResultCache =
+        DPQueriesCache =
                 CacheBuilder.newBuilder()
                         .recordStats()
                         .maximumWeight(100000)
                         .weigher(
-                                (Weigher<MaxFreqQuery, Integer>)
-                                        (k, resultSize) -> k.getQuerySize())
+                                (Weigher<Query, DPQuery>)
+                                        (k, resultSize) -> k.getQueryPattern().toString().length())
                         .build(
-                                new CacheLoader<MaxFreqQuery, Integer>() {
+                                new CacheLoader<Query, DPQuery>() {
 
                                     @Override
-                                    public Integer load(MaxFreqQuery s) {
-                                        logger.info(
-                                                "into mostPopularValueCache CacheLoader, loading: "
-                                                        + s);
-                                        return getMostFrequentResult(
-                                                s.getOriginalQuery(),
-                                                s.getQuery(),
-                                                s.getVariableString());
+                                    public DPQuery load(Query key) {
+                                        logger.info("into DPQueries CacheLoader, loading: " + key);
+                                        DPQuery dpQuery = new DPQuery();
+                                        dpQuery.setModel(executeConstructQuery(key));
+                                        List<List<String>> triplePatterns = new ArrayList<>();
+
+                                        Map<String, List<TriplePath>> starQueriesMap =
+                                                Helper.getStarPatterns(key);
+
+                                        setMostFreqValueMaps(
+                                                dpQuery.getModel(),
+                                                dpQuery.getMostFrequentResults(),
+                                                key,
+                                                starQueriesMap,
+                                                triplePatterns);
+
+                                        long graphSize =
+                                                calculateGraphSizeTriples(
+                                                        dpQuery.getModel(), triplePatterns);
+
+                                        dpQuery.setGraphSizeTriples(graphSize);
+
+                                        double DELTA = 1 / Math.pow(graphSize, 2);
+                                        double beta = EPSILON / (2 * Math.log(2 / DELTA));
+
+                                        String elasticStability = "0";
+                                        int k = 0;
+
+                                        Sensitivity smoothSensitivity;
+
+                                        dpQuery.setIsStarQuery(Helper.isStarQuery(key));
+
+                                        if (dpQuery.isStarQuery()) {
+                                            elasticStability = "x";
+
+                                            Sensitivity sensitivity =
+                                                    new Sensitivity(1.0, elasticStability);
+
+                                            smoothSensitivity =
+                                                    GraphElasticSensitivity
+                                                            .smoothElasticSensitivityStar(
+                                                                    elasticStability,
+                                                                    sensitivity,
+                                                                    beta,
+                                                                    k);
+
+                                            logger.info(
+                                                    "Star query (smooth) sensitivity: "
+                                                            + smoothSensitivity.getSensitivity());
+                                            dpQuery.setElasticStability(elasticStability);
+
+                                        } else {
+                                            List<StarQuery> listStars = new ArrayList<>();
+
+                                            for (List<TriplePath> tp : starQueriesMap.values()) {
+                                                listStars.add(new StarQuery(tp));
+                                            }
+
+                                            StarQuery sq =
+                                                    GraphElasticSensitivity.calculateSensitivity(
+                                                            HDTDataSource.this,
+                                                            dpQuery.getMostFrequentResults(),
+                                                            listStars);
+
+                                            logger.info(
+                                                    "Elastic Stability: "
+                                                            + sq.getElasticStability());
+
+                                            smoothSensitivity =
+                                                    GraphElasticSensitivity
+                                                            .smoothElasticSensitivity(
+                                                                    sq.getElasticStability(),
+                                                                    0,
+                                                                    beta,
+                                                                    k,
+                                                                    graphSize);
+
+                                            logger.info(
+                                                    "Path Smooth Sensitivity: "
+                                                            + smoothSensitivity.getSensitivity());
+                                            dpQuery.setElasticStability(sq.getElasticStability());
+                                        }
+                                        logger.info("SmoothSensitivity:" + smoothSensitivity);
+                                        dpQuery.setSmoothSensitivity(smoothSensitivity);
+
+                                        return dpQuery;
                                     }
                                 });
 
-        graphModelsCache =
-                CacheBuilder.newBuilder()
-                        .recordStats()
-                        .maximumWeight(1000)
-                        .weigher((Weigher<Query, Model>) (k, resultSize) -> k.toString().length())
-                        .build(
-                                new CacheLoader<Query, Model>() {
+        mostFrequentResultCache = CacheBuilder.newBuilder().recordStats()
+                .maximumWeight(100000)
+                .weigher(new Weigher<MaxFreqQuery, Integer>() {
+                    public int weigh(MaxFreqQuery k, Integer resultSize) {
+                        return k.getQuerySize();
+                    }
+                }).build(new CacheLoader<MaxFreqQuery, Integer>() {
+                    @Override
+                    public Integer load(MaxFreqQuery s) throws Exception {
+                        logger.debug(
+                                "into mostPopularValueCache CacheLoader, loading: "
+                                        + s.toString());
+                        return getMostFrequentResult(s.getQuery(),
+                                s.getVariableString());
+                    }
+                });
+    }
 
-                                    @Override
-                                    public Model load(Query query) {
-                                        logger.debug(
-                                                "into graphSizeCache CacheLoader, loading: "
-                                                        + query);
-                                        return executeConstructQuery(query);
-                                    }
-                                });
-
-        graphSizeTriplesCache =
-                CacheBuilder.newBuilder()
-                        .recordStats()
-                        .maximumWeight(1000)
-                        .weigher(
-                                (Weigher<List<List<String>>, Long>)
-                                        (k, resultSize) -> k.toString().length())
-                        .build(
-                                new CacheLoader<List<List<String>>, Long>() {
-
-                                    @Override
-                                    public Long load(List<List<String>> triplePatternsCount) {
-                                        logger.debug(
-                                                "into graphSizeCacheTriples CacheLoader, loading: "
-                                                        + triplePatternsCount);
-                                        return calculateGraphSizeTriples(triplePatternsCount);
-                                    }
-                                });
+    public DPQuery getDPQuery(Query key) {
+        return DPQueriesCache.getUnchecked(key);
     }
 
     @Override
     public long getGraphSize(Query query) {
-        return (graphModelsCache.getUnchecked(query).size());
+        return (DPQueriesCache.getUnchecked(query).getModel().size());
     }
 
     public Model executeConstructQuery(Query query) {
@@ -118,8 +183,7 @@ public class HDTDataSource implements DataSource {
         logger.info("constructQuery: " + constructQuery);
 
         try (QueryExecution qexec = QueryExecutionFactory.create(query, triples)) {
-            Model results = qexec.execConstruct();
-            return results;
+            return qexec.execConstruct();
         }
     }
 
@@ -128,20 +192,39 @@ public class HDTDataSource implements DataSource {
 
         Query query = QueryFactory.create(queryString);
 
-        /* no entiendo por que esta esto
+        // no entiendo por que esta esto
         if (queryString.contains("http://www.wikidata.org/prop/direct/P31") &&
                 (queryString.lastIndexOf('?') != queryString.indexOf('?'))) {
             return 85869721;
-        }*/
-        QueryExecution qexec;
-
-        try {
-            Model modelQuery = graphModelsCache.get(query);
-            qexec = QueryExecutionFactory.create(query, modelQuery);
-
-        } catch (ExecutionException e) {
-            qexec = QueryExecutionFactory.create(query, triples);
         }
+
+        QueryExecution qexec = qexec = QueryExecutionFactory.create(query, triples);
+
+        ResultSet results = qexec.execSelect();
+        QuerySolution soln = results.nextSolution();
+
+        logger.info("Count query executed... ");
+
+        qexec.close();
+
+        RDFNode x = soln.get(soln.varNames().next());
+        int countResult = x.asLiteral().getInt();
+
+        logger.info("Count query result (endpoint): " + countResult);
+        return countResult;
+    }
+
+    public int executeCountQueryInternal(Model model, String queryString) {
+
+        Query query = QueryFactory.create(queryString);
+
+        // no entiendo por que esta esto
+        if (queryString.contains("http://www.wikidata.org/prop/direct/P31") &&
+                (queryString.lastIndexOf('?') != queryString.indexOf('?'))) {
+            return 85869721;
+        }
+
+        QueryExecution qexec = QueryExecutionFactory.create(query, model);
 
         ResultSet results = qexec.execSelect();
         QuerySolution soln = results.nextSolution();
@@ -161,14 +244,13 @@ public class HDTDataSource implements DataSource {
        @description Sum all COUNTs of every generated query.
     */
     @Override
-    public Long getGraphSizeTriples(List<List<String>> triplePatternsCount) {
-        return (graphSizeTriplesCache.getUnchecked(triplePatternsCount));
+    public Long getGraphSizeTriples(Query query) {
+        return (DPQueriesCache.getUnchecked(query).getGraphSizeTriples());
     }
 
-    public Long calculateGraphSizeTriples(List<List<String>> triplePatternsCount) {
+    public Long calculateGraphSizeTriples(Model model, List<List<String>> triplePatternsCount) {
 
         long count = 0L;
-        System.out.println("triplePatternsCount:" + triplePatternsCount);
 
         // triplePatternsCount has all triples generated by setMostFreqValueMaps method
         for (List<String> star : triplePatternsCount) {
@@ -181,8 +263,8 @@ public class HDTDataSource implements DataSource {
 
             logger.info("Construct query for graph size so far: " + construct);
             count +=
-                    executeCountQuery(
-                            "SELECT (COUNT(*) as ?count) WHERE { " + construct + "} ", false);
+                    executeCountQueryInternal(
+                            model, "SELECT (COUNT(*) as ?count) WHERE { " + construct + "} ");
             logger.info("Graph size so far: " + count);
         }
         logger.info("count: " + count);
@@ -190,12 +272,21 @@ public class HDTDataSource implements DataSource {
     }
 
     @Override
-    public int mostFrequentResult(Query originalQuery, MaxFreqQuery maxFreqQuery) {
-        return mostFrequentResultCache.getUnchecked(maxFreqQuery);
+    public int mostFrequentResult(MaxFreqQuery maxFreqQuery)
+    {
+        try {
+            return this.mostFrequentResultCache.get(maxFreqQuery);
+
+        } catch (ExecutionException ex) {
+            java.util.logging.Logger.getLogger(HDTDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            return -1;
+        }
     }
 
     @Override
     public void setMostFreqValueMaps(
+            Model model,
+            HashMap<MaxFreqQuery, Integer> mostFrequentResults,
             Query originalQuery,
             Map<String, List<TriplePath>> starQueriesMap,
             List<List<String>> triplePatterns) {
@@ -205,6 +296,7 @@ public class HDTDataSource implements DataSource {
 
         // EDITED
         logger.info("StarQueriesMap: " + starQueriesMap);
+        logger.info("triplePatterns: " + triplePatterns);
 
         for (String key : starQueriesMap.keySet()) {
 
@@ -252,15 +344,19 @@ public class HDTDataSource implements DataSource {
                 logger.info("var: " + var);
 
                 MaxFreqQuery query =
-                        new MaxFreqQuery(
-                                originalQuery, Helper.getStarQueryString(starQueryLeft), var);
+                        new MaxFreqQuery(Helper.getStarQueryString(starQueryLeft), var);
 
                 if (mapMostFreqValue.containsKey(var)) {
                     List<Integer> mostFreqValues = mapMostFreqValue.get(var);
                     List<StarQuery> mostFreqValuesStar = mapMostFreqValueStar.get(var);
 
                     if (!mostFreqValues.isEmpty()) {
-                        mostFreqValues.add(mostFrequentResultCache.getUnchecked(query));
+                        mostFrequentResults.computeIfAbsent(
+                                query,
+                                k ->
+                                        getMostFrequentResult(k.getQuery(), k.getVariableString()));
+
+                        mostFreqValues.add(mostFrequentResults.get(query));
                         mapMostFreqValue.put(var, mostFreqValues);
 
                         mostFreqValuesStar.add(new StarQuery(starQueryLeft));
@@ -269,10 +365,10 @@ public class HDTDataSource implements DataSource {
 
                 } else {
                     List<Integer> mostFreqValues = new ArrayList<>();
-                    logger.info("Query: " + query.getQuery());
-                    logger.info("Variable: " + query.getVariableString());
-
-                    mostFreqValues.add(mostFrequentResultCache.getUnchecked(query));
+                    mostFrequentResults.computeIfAbsent(
+                            query,
+                            k -> getMostFrequentResult(k.getQuery(), k.getVariableString()));
+                    mostFreqValues.add(mostFrequentResults.get(query));
                     mapMostFreqValue.put(var, mostFreqValues);
 
                     List<StarQuery> mostFreqValuesStar = new ArrayList<>();
@@ -294,7 +390,8 @@ public class HDTDataSource implements DataSource {
         return mapMostFreqValue;
     }
 
-    private int getMostFrequentResult(Query originalQuery, String starQuery, String variableName) {
+    @Override
+    public int getMostFrequentResult(String starQuery, String variableName) {
 
         variableName = variableName.replace("“", "").replace("”", "");
 
@@ -316,15 +413,15 @@ public class HDTDataSource implements DataSource {
         logger.info("query at getMostFrequentResult: " + maxFreqQueryString);
 
         Query query = QueryFactory.create(maxFreqQueryString);
-        QueryExecution qexec;
+        QueryExecution qexec = qexec = QueryExecutionFactory.create(query, triples);
 
-        try {
-            Model modelQuery = graphModelsCache.get(originalQuery);
+        /*try {
+            Model modelQuery = DPQueriesCache.get(originalQuery).getModel();
             qexec = QueryExecutionFactory.create(query, modelQuery);
 
         } catch (ExecutionException e) {
-            qexec = QueryExecutionFactory.create(query, triples);
-        }
+            qexec = QueryExecutionFactory.sparqlService(dataSource, query);
+        }*/
 
         ResultSet results = qexec.execSelect();
 

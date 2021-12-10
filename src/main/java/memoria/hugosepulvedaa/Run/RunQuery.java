@@ -18,6 +18,9 @@ public class RunQuery {
 
     private static final Logger logger = LogManager.getLogger(RunQuery.class.getName());
 
+    // privacy budget
+    private static final double EPSILON = 0.1;
+
     static String queryString;
     static String queryFile;
     static String dataFile;
@@ -73,9 +76,9 @@ public class RunQuery {
 
             if (cmd.hasOption("f")) {
                 System.out.println("Endpoint");
-                endpointDataSource = new EndpointDataSource(endpoint);
+                endpointDataSource = new EndpointDataSource(endpoint, EPSILON);
             } else {
-                hdtDataSource = new HDTDataSource(queryString);
+                hdtDataSource = new HDTDataSource(queryString, EPSILON);
             }
 
             Path queryLocation = Paths.get(queryString);

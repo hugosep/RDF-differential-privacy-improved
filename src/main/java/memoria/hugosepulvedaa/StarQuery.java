@@ -12,7 +12,7 @@ public class StarQuery implements Comparable<StarQuery> {
     private final List<TriplePath> triples;
 
     // the smoothed sensitivity of the star query
-    // private Sensitivity querySentitivity;
+    // private Sensitivity querySensitivity;
 
     // elastic stability is the formula by which we calculate the sensitivity,
     // only appears when there are more than two star queries

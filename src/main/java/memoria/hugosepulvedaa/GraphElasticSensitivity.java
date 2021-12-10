@@ -1,6 +1,6 @@
 package memoria.hugosepulvedaa;
 
-import org.apache.jena.query.Query;
+import org.apache.jena.rdf.model.Model;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matheclipse.core.eval.ExprEvaluator;
@@ -9,10 +9,8 @@ import symjava.bytecode.BytecodeFunc;
 import symjava.symbolic.Expr;
 import symjava.symbolic.Func;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import javax.xml.crypto.Data;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GraphElasticSensitivity {
@@ -20,7 +18,7 @@ public class GraphElasticSensitivity {
     private static final Logger logger =
             LogManager.getLogger(GraphElasticSensitivity.class.getName());
 
-    public static double setOfMappingsSensitivity(
+    /*public static double setOfMappingsSensitivity(
             Expr elasticSensitivity, double prevSensitivity, double beta, int k) {
 
         Func f1 = new Func("f1", elasticSensitivity);
@@ -33,7 +31,7 @@ public class GraphElasticSensitivity {
         } else {
             return setOfMappingsSensitivity(elasticSensitivity, smoothSensitivity, beta, k + 1);
         }
-    }
+    }*/
 
     /* previous function
     public static StarQuery calculateSensitivity(int k,
@@ -42,7 +40,9 @@ public class GraphElasticSensitivity {
                                                  DataSource dataSource)
     */
     public static StarQuery calculateSensitivity(
-            Query originalQuery, List<StarQuery> listStars, DataSource dataSource) {
+            DataSource dataSource,
+            HashMap<MaxFreqQuery, Integer> mostFrequentResults,
+            List<StarQuery> listStars) {
 
         StarQuery starQueryFirst = Collections.max(listStars);
         listStars.remove(starQueryFirst);
@@ -54,7 +54,8 @@ public class GraphElasticSensitivity {
         StarQuery starQuerySecond;
 
         if (listStars.size() > 1) {
-            starQuerySecond = calculateSensitivity(originalQuery, listStars, dataSource);
+            starQuerySecond =
+                    calculateSensitivity(dataSource, mostFrequentResults, listStars);
 
         } else {
             // second star query in the map
@@ -67,14 +68,15 @@ public class GraphElasticSensitivity {
             starQuerySecond.setElasticStability(elasticStabilityPrime);
         }
         // now we join, S_G(star2, G)
-        return calculateJoinSensitivity(originalQuery, starQueryFirst, starQuerySecond, dataSource);
+        return calculateJoinSensitivity(
+                dataSource, mostFrequentResults, starQueryFirst, starQuerySecond);
     }
 
     private static StarQuery calculateJoinSensitivity(
-            Query originalQuery,
+            DataSource dataSource,
+            HashMap<MaxFreqQuery, Integer> mostFrequentResults,
             StarQuery starQueryLeft,
-            StarQuery starQueryRight,
-            DataSource hdtDataSource) {
+            StarQuery starQueryRight) {
 
         List<String> joinVariables = starQueryLeft.getVariables();
         joinVariables.retainAll(starQueryRight.getVariables());
@@ -85,7 +87,8 @@ public class GraphElasticSensitivity {
         if (starQueryLeft.getMostPopularValue() == null) {
             mostPopularValueLeft =
                     mostPopularValue(
-                            originalQuery, joinVariables.get(0), starQueryLeft, hdtDataSource);
+                            joinVariables.get(0),
+                            starQueryLeft, dataSource);
             logger.info("mostPopularValueLeft: " + mostPopularValueLeft);
             starQueryLeft.setMostPopularValue(mostPopularValueLeft);
 
@@ -96,7 +99,8 @@ public class GraphElasticSensitivity {
         if (starQueryRight.getMostPopularValue() == null) {
             mostPopularValueRight =
                     mostPopularValue(
-                            originalQuery, joinVariables.get(0), starQueryRight, hdtDataSource);
+                            joinVariables.get(0),
+                            starQueryRight, dataSource);
             logger.info("mostPopularValueRight: " + mostPopularValueRight);
             starQueryRight.setMostPopularValue(mostPopularValueRight);
         } else {
@@ -147,14 +151,14 @@ public class GraphElasticSensitivity {
      * mostPopularValue(joinVariable a, StarQuery starQuery, DataSource)
      */
     private static String mostPopularValue(
-            Query originalQuery, String var, StarQuery starQuery, DataSource dataSource) {
+            String var,
+            StarQuery starQuery, DataSource dataSource) {
         // base case: mp(a,s_1,G)
         // Expr expr = x;
-        String constant =
-                Integer.toString(
-                        dataSource.mostFrequentResult(
-                                originalQuery,
-                                new MaxFreqQuery(originalQuery, starQuery.toString(), var)));
+        MaxFreqQuery maxFreqQuery = new MaxFreqQuery(starQuery.toString(), var);
+
+        String constant = Integer.toString(dataSource.mostFrequentResult(maxFreqQuery));
+
         /*expr =
                 expr.plus(
                         dataSource.mostFrequentResult(new MaxFreqQuery(starQuery.toString(), var)));

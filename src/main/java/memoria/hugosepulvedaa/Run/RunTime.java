@@ -1,7 +1,6 @@
 package memoria.hugosepulvedaa.Run;
 
 import memoria.hugosepulvedaa.*;
-import memoria.hugosepulvedaa.DPQuery;
 import org.apache.commons.cli.*;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
@@ -14,16 +13,21 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
-public class RunSymbolic {
+public class RunTime {
 
-    private static final Logger logger = LogManager.getLogger(RunSymbolic.class.getName());
+    private static final Logger logger = LogManager.getLogger(RunTime.class.getName());
 
     // privacy budget
     private static double EPSILON = 0.1;
@@ -35,6 +39,10 @@ public class RunSymbolic {
     private static String endpoint;
     private static boolean evaluation = false;
     private static boolean is_endpoint = false;
+
+    private static long startTime;
+    private static long endTime;
+    private static HashMap<String, List<Double>> mapTimes = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
 
@@ -58,31 +66,38 @@ public class RunSymbolic {
 
             } else if (Files.isDirectory(queryLocation)) {
 
-                Iterator<Path> filesPath =
+                SecureRandom secureRandom = new SecureRandom();
+
+                List<Path> filesPath =
                         Files.list(Paths.get(queryFile))
                                 .filter(p -> p.toString().endsWith(".rq"))
-                                .iterator();
+                                .collect(Collectors.toList());
+
+                for(Path filePath : filesPath) {
+                    mapTimes.put(filePath.toString(), new ArrayList<>());
+                }
 
                 logger.info("Running analysis to DIRECTORY: " + queryLocation);
 
-                while (filesPath.hasNext()) {
+                for (int i = 0; i < 100; i++) {
 
-                    Path nextQuery = filesPath.next();
+                    Path chosenFile = filesPath.get(secureRandom.nextInt(filesPath.size()));
 
-                    logger.info("Running analysis to query: " + nextQuery.toString());
+                    logger.info("Running analysis to query: " + chosenFile.toString());
 
-                    queryString = new Scanner(nextQuery).useDelimiter("\\Z").next();
+                    queryString = new Scanner(chosenFile).useDelimiter("\\Z").next();
 
                     try {
+
                         runAnalysis(
-                                nextQuery.toString(),
+                                chosenFile.toString(),
                                 queryString,
                                 dataSource,
                                 outputFile,
                                 evaluation,
                                 EPSILON);
                     } catch (Exception e) {
-                        logger.error("query failed!!: " + nextQuery);
+                        logger.error("query failed - " + chosenFile + ": " + e.getMessage());
                     }
                 }
             } else {
@@ -107,6 +122,8 @@ public class RunSymbolic {
 
         // execute COUNT query
         int countQueryResult = dataSource.executeCountQuery(queryString, true);
+
+        startTime = System.nanoTime();
 
         Query q = QueryFactory.create(queryString);
         ElementGroup queryPattern = (ElementGroup) q.getQueryPattern();
@@ -258,6 +275,14 @@ public class RunSymbolic {
             resultList.add(countQueryResult);
         }
 
+        // stopTime
+        endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        double durationInSeconds = (double) (duration / 1000000000);
+        logger.info("Time: " + durationInSeconds + " seconds");
+
+        mapTimes.get(queryFile).add(durationInSeconds);
+
         Result result =
                 new Result(
                         queryFile,
@@ -277,5 +302,13 @@ public class RunSymbolic {
         String resultsBuffer = result.toString().replace('\n', ' ') + "\n";
 
         Files.write(Paths.get(outputFile), resultsBuffer.getBytes(), StandardOpenOption.APPEND);
+
+        for (String key : mapTimes.keySet()) {
+            List<Double> durations = mapTimes.get(key);
+
+            for(Double d: durations) {
+                Files.write(Paths.get("fileTimes"), Double.toString(d).getBytes(), StandardOpenOption.APPEND);
+            }
+        }
     }
 }
