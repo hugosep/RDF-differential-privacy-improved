@@ -1,15 +1,10 @@
 package memoria.hugosepulvedaa;
 
-import org.apache.jena.rdf.model.Model;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matheclipse.core.eval.ExprEvaluator;
 import org.matheclipse.core.interfaces.IExpr;
-import symjava.bytecode.BytecodeFunc;
-import symjava.symbolic.Expr;
-import symjava.symbolic.Func;
 
-import javax.xml.crypto.Data;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,8 +49,7 @@ public class GraphElasticSensitivity {
         StarQuery starQuerySecond;
 
         if (listStars.size() > 1) {
-            starQuerySecond =
-                    calculateSensitivity(dataSource, mostFrequentResults, listStars);
+            starQuerySecond = calculateSensitivity(dataSource, mostFrequentResults, listStars);
 
         } else {
             // second star query in the map
@@ -86,9 +80,7 @@ public class GraphElasticSensitivity {
 
         if (starQueryLeft.getMostPopularValue() == null) {
             mostPopularValueLeft =
-                    mostPopularValue(
-                            joinVariables.get(0),
-                            starQueryLeft, dataSource);
+                    mostPopularValue(joinVariables.get(0), starQueryLeft, dataSource);
             logger.info("mostPopularValueLeft: " + mostPopularValueLeft);
             starQueryLeft.setMostPopularValue(mostPopularValueLeft);
 
@@ -98,9 +90,7 @@ public class GraphElasticSensitivity {
 
         if (starQueryRight.getMostPopularValue() == null) {
             mostPopularValueRight =
-                    mostPopularValue(
-                            joinVariables.get(0),
-                            starQueryRight, dataSource);
+                    mostPopularValue(joinVariables.get(0), starQueryRight, dataSource);
             logger.info("mostPopularValueRight: " + mostPopularValueRight);
             starQueryRight.setMostPopularValue(mostPopularValueRight);
         } else {
@@ -150,9 +140,7 @@ public class GraphElasticSensitivity {
     /*
      * mostPopularValue(joinVariable a, StarQuery starQuery, DataSource)
      */
-    private static String mostPopularValue(
-            String var,
-            StarQuery starQuery, DataSource dataSource) {
+    private static String mostPopularValue(String var, StarQuery starQuery, DataSource dataSource) {
         // base case: mp(a,s_1,G)
         // Expr expr = x;
         MaxFreqQuery maxFreqQuery = new MaxFreqQuery(starQuery.toString(), var);

@@ -1,9 +1,6 @@
 package memoria.hugosepulvedaa;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.cache.Weigher;
+import com.google.common.cache.*;
 import memoria.hugosepulvedaa.utils.Helper;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
@@ -148,22 +145,27 @@ public class HDTDataSource implements DataSource {
                                     }
                                 });
 
-        mostFrequentResultCache = CacheBuilder.newBuilder().recordStats()
-                .maximumWeight(100000)
-                .weigher(new Weigher<MaxFreqQuery, Integer>() {
-                    public int weigh(MaxFreqQuery k, Integer resultSize) {
-                        return k.getQuerySize();
-                    }
-                }).build(new CacheLoader<MaxFreqQuery, Integer>() {
-                    @Override
-                    public Integer load(MaxFreqQuery s) throws Exception {
-                        logger.debug(
-                                "into mostPopularValueCache CacheLoader, loading: "
-                                        + s.toString());
-                        return getMostFrequentResult(s.getQuery(),
-                                s.getVariableString());
-                    }
-                });
+        mostFrequentResultCache =
+                CacheBuilder.newBuilder()
+                        .recordStats()
+                        .maximumWeight(100000)
+                        .weigher(
+                                new Weigher<MaxFreqQuery, Integer>() {
+                                    public int weigh(MaxFreqQuery k, Integer resultSize) {
+                                        return k.getQuerySize();
+                                    }
+                                })
+                        .build(
+                                new CacheLoader<MaxFreqQuery, Integer>() {
+                                    @Override
+                                    public Integer load(MaxFreqQuery s) throws Exception {
+                                        logger.debug(
+                                                "into mostPopularValueCache CacheLoader, loading: "
+                                                        + s.toString());
+                                        return getMostFrequentResult(
+                                                s.getQuery(), s.getVariableString());
+                                    }
+                                });
     }
 
     public DPQuery getDPQuery(Query key) {
@@ -193,8 +195,8 @@ public class HDTDataSource implements DataSource {
         Query query = QueryFactory.create(queryString);
 
         // no entiendo por que esta esto
-        if (queryString.contains("http://www.wikidata.org/prop/direct/P31") &&
-                (queryString.lastIndexOf('?') != queryString.indexOf('?'))) {
+        if (queryString.contains("http://www.wikidata.org/prop/direct/P31")
+                && (queryString.lastIndexOf('?') != queryString.indexOf('?'))) {
             return 85869721;
         }
 
@@ -219,8 +221,8 @@ public class HDTDataSource implements DataSource {
         Query query = QueryFactory.create(queryString);
 
         // no entiendo por que esta esto
-        if (queryString.contains("http://www.wikidata.org/prop/direct/P31") &&
-                (queryString.lastIndexOf('?') != queryString.indexOf('?'))) {
+        if (queryString.contains("http://www.wikidata.org/prop/direct/P31")
+                && (queryString.lastIndexOf('?') != queryString.indexOf('?'))) {
             return 85869721;
         }
 
@@ -272,13 +274,13 @@ public class HDTDataSource implements DataSource {
     }
 
     @Override
-    public int mostFrequentResult(MaxFreqQuery maxFreqQuery)
-    {
+    public int mostFrequentResult(MaxFreqQuery maxFreqQuery) {
         try {
             return this.mostFrequentResultCache.get(maxFreqQuery);
 
         } catch (ExecutionException ex) {
-            java.util.logging.Logger.getLogger(HDTDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(HDTDataSource.class.getName())
+                    .log(Level.SEVERE, null, ex);
             return -1;
         }
     }
@@ -353,8 +355,7 @@ public class HDTDataSource implements DataSource {
                     if (!mostFreqValues.isEmpty()) {
                         mostFrequentResults.computeIfAbsent(
                                 query,
-                                k ->
-                                        getMostFrequentResult(k.getQuery(), k.getVariableString()));
+                                k -> getMostFrequentResult(k.getQuery(), k.getVariableString()));
 
                         mostFreqValues.add(mostFrequentResults.get(query));
                         mapMostFreqValue.put(var, mostFreqValues);
@@ -366,8 +367,7 @@ public class HDTDataSource implements DataSource {
                 } else {
                     List<Integer> mostFreqValues = new ArrayList<>();
                     mostFrequentResults.computeIfAbsent(
-                            query,
-                            k -> getMostFrequentResult(k.getQuery(), k.getVariableString()));
+                            query, k -> getMostFrequentResult(k.getQuery(), k.getVariableString()));
                     mostFreqValues.add(mostFrequentResults.get(query));
                     mapMostFreqValue.put(var, mostFreqValues);
 
@@ -434,5 +434,13 @@ public class HDTDataSource implements DataSource {
         } else {
             return 0;
         }
+    }
+
+    public CacheStats getDPQueriesCache() {
+        return DPQueriesCache.stats();
+    }
+
+    public CacheStats getMostFrequentResultCache() {
+        return mostFrequentResultCache.stats();
     }
 }

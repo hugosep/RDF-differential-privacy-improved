@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-public class RunTime {
+public class RunTimeCache {
 
-    private static final Logger logger = LogManager.getLogger(RunTime.class.getName());
+    private static final Logger logger = LogManager.getLogger(RunTimeCache.class.getName());
 
     // privacy budget
     private static double EPSILON = 0.1;
@@ -70,18 +70,26 @@ public class RunTime {
                                 .filter(p -> p.toString().endsWith(".rq"))
                                 .collect(Collectors.toList());
 
-                logger.info("Running analysis to DIRECTORY: " + queryLocation);
-
                 for (Path filePath : filesPath) {
                     mapTimes.put(filePath.toString(), new ArrayList<>());
-                    logger.info("Running analysis to query: " + filePath);
+                }
 
-                    queryString = new Scanner(filePath).useDelimiter("\\Z").next();
+                logger.info("Running analysis to DIRECTORY: " + queryLocation);
+
+                File planCache = new File("resources/wikidata_queries/planCache1.txt");
+                Scanner reader = new Scanner(planCache);
+
+                while (reader.hasNextLine()) {
+
+                    Path chosenFile = Paths.get(reader.nextLine());
+
+                    logger.info("Running analysis to query: " + chosenFile);
+
+                    queryString = new Scanner(chosenFile).useDelimiter("\\Z").next();
 
                     try {
-
                         runAnalysis(
-                                filePath.toString(),
+                                chosenFile.toString(),
                                 queryString,
                                 dataSource,
                                 outputFile,
@@ -90,6 +98,38 @@ public class RunTime {
                     } catch (Exception e) {
                         logger.error(e.toString());
                     }
+                }
+
+                try {
+                    File fileCache = new File("fileCacheStats.txt");
+
+                    if (fileCache.createNewFile()) {
+                        System.out.println("File created: " + fileCache.getName());
+                    } else {
+                        System.out.println("File already exists.");
+                    }
+
+                    String cacheStats = "DPQueriesCacheStats: " + dataSource.getDPQueriesCache().toString() + "\n";
+
+                    Files.write(
+                            Paths.get("fileCacheStats.txt"),
+                            cacheStats.getBytes(),
+                            StandardOpenOption.APPEND);
+
+                    logger.info("graphSizeCacheStats: " + cacheStats);
+
+                    cacheStats = "mostFrequentResultCacheStats: " + dataSource.getMostFrequentResultCache().toString() + "\n";
+
+                    Files.write(
+                            Paths.get("fileCacheStats.txt"),
+                            cacheStats.getBytes(),
+                            StandardOpenOption.APPEND);
+
+                    logger.info("getMostFrequenResultCacheStats: " + cacheStats);
+
+                } catch (IOException e) {
+                    System.out.println("An error occurred.");
+                    e.printStackTrace();
                 }
 
                 try {

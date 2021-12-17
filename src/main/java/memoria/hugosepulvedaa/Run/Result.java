@@ -3,9 +3,7 @@ package memoria.hugosepulvedaa.Run;
 import memoria.hugosepulvedaa.StarQuery;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import symjava.symbolic.Expr;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

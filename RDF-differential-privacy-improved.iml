@@ -20,14 +20,14 @@
     <orderEntry type="library" name="google.code.gson" level="project" />
     <orderEntry type="library" name="rdfhdt.hdt.jena" level="project" />
     <orderEntry type="library" name="rdfhdt.hdt.java.core" level="project" />
-    <orderEntry type="library" name="apache.jena.core" level="project" />
     <orderEntry type="library" name="google.guava" level="project" />
-    <orderEntry type="library" name="apache.jena.arq" level="project" />
     <orderEntry type="library" name="apache.logging.log4j.core" level="project" />
     <orderEntry type="library" name="Python 3.8 (RDF-differential-privacy-improved) interpreter library" level="application" />
     <orderEntry type="library" name="SymJava-1.1.2" level="project" />
     <orderEntry type="library" name="lib" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.13.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
+    <orderEntry type="library" name="apache.jena.core" level="project" />
+    <orderEntry type="library" name="apache.jena.arq" level="project" />
   </component>
 </module>

@@ -1,7 +1,5 @@
 package memoria.hugosepulvedaa;
 
-import symjava.symbolic.Expr;
-
 public class Sensitivity {
     /*
     @sensitivity double the value of the query sensitivity

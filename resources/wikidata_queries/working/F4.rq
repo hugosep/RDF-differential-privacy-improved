@@ -1,17 +1,8 @@
-# Scientists, 330000 results
 
-#added before 2016-10
-# humans without children, 256
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-PREFIX wd: <http://www.wikidata.org/entity/>
-PREFIX schema: <http://schema.org/>
-SELECT (count(distinct ?human) as ?number)
-WHERE
-{
-  ?human wdt:P31 wd:Q5 .
-  ?human wdt:P21 ?gender .
-  ?human wdt:P106 ?tmp .
-  ?tmp wdt:P279 wd:Q901 .
+SELECT  ( COUNT (  ?var2  ) AS  ?var3  ) WHERE {
+  ?var2  <http://www.wikidata.org/prop/direct/P31> ?tmp .
+  ?tmp <http://www.wikidata.org/prop/direct/P279> <http://www.wikidata.org/entity/Q21480300> .
+  ?var2   <http://www.wikidata.org/prop/direct/P585>  ?var4 .
+  ?var2   <http://www.wikidata.org/prop/direct/P17>  ?var1 .
+  FILTER (  ( (  ?var4  >=  "2000-01-01"^^<http://www.w3.org/2001/XMLSchema#dateTime>  ) ) )
 }
