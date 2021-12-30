@@ -4,30 +4,30 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2c4b3c1a-d253-4ec3-a949-86e1468970ea" name="Changes" comment="Add RunTime: measure duration of queries.">
-      <change afterPath="$PROJECT_DIR$/resources/wikidata_queries/planCache1.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/F6.rq" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTimeCache.java" afterDir="false" />
+    <list default="true" id="2c4b3c1a-d253-4ec3-a949-86e1468970ea" name="Changes" comment="Pre re-factor cache.">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/github_ben_manes_caffeine.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/SymJava_1_1_2.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/libraries/apache_jena_arq.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/libraries/apache_jena_core.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/apache_logging_log4j_core.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/apache_logging_log4j_core.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/google_guava.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RDF-differential-privacy-improved.iml" beforeDir="false" afterPath="$PROJECT_DIR$/RDF-differential-privacy-improved.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/F3prime.rq" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/F4.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/F4.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/F5.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/F5.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/L5.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/outTest/L5.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/S3.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/S3.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/S4.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/S4.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/S5.rq" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/S5prime.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/outTest/S5prime.rq" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/fileTimeCache.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/fileTimeCache.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/outTest/L5.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/TestOut/L5.rq" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/outTest/S5prime.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/TestOut/S5prime.rq" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/planCache.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/planCache1.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/F1.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/F1.rq" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/F2.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/F2.rq" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/F6.rq" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/S2.rq" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/HDTDataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/HDTDataSource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/Result.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/Result.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTime.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTime.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Sensitivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Sensitivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/MaxFreqQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/MaxFreqQuery.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTimeCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTimeCache.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,11 +53,11 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTime.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTimeCache.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTime.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -81,37 +81,38 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="TODO_SCOPE" value="All Places" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/wikidata_queries" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Downloads/execution-sounds-1.5.jar" />
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.40574712" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="project.propCompiler" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\resources\wikidata_queries" />
+      <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\resources\wikidata_queries\working" />
       <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\src\main\resources" />
       <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved" />
       <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\src\main\java" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\src\test" />
+      <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\resources\wikidata_queries\TestOut" />
       <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\resources\wikidata_queries\working" />
       <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\resources" />
       <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\resources\wikidata_queries" />
-      <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\resources\wikidata_queries\working\outTest" />
-      <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\lib" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="memoria.hugosepulvedaa.Run" />
       <recent name="memoria.hugosepulvedaa" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.RunTime">
+  <component name="RunManager" selected="Application.RunTimeCache">
     <configuration name="RunSymbolic" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="memoria.hugosepulvedaa.Run.RunSymbolic" />
       <module name="RDF-differential-privacy-improved" />
-      <option name="PROGRAM_PARAMETERS" value="-endpoint https://query.wikidata.org/sparql -f resources/wikidata_queries/working/F3.rq -o output " />
+      <option name="PROGRAM_PARAMETERS" value="-endpoint https://query.wikidata.org/sparql -f resources/wikidata_queries/working/L1.rq -o output " />
       <option name="VM_PARAMETERS" value="-Dlog4j2.info=true" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -146,8 +147,8 @@
     </configuration>
     <list>
       <item itemvalue="Application.RunSymbolic" />
-      <item itemvalue="Application.RunTime" />
       <item itemvalue="Application.RunTimeCache" />
+      <item itemvalue="Application.RunTime" />
       <item itemvalue="JUnit.MaxFreqQueryTest" />
     </list>
     <recent_temporary>
@@ -361,7 +362,14 @@
       <option name="project" value="LOCAL" />
       <updated>1639175797638</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="Pre re-factor cache.">
+      <created>1639782076401</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1639782076401</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -393,7 +401,8 @@
     <MESSAGE value="All formatted." />
     <MESSAGE value="Final cache: model, graphSizeTriples, isStarQuery, EPSILON, beta, delta, elasticStability, smoothSensitivity." />
     <MESSAGE value="Add RunTime: measure duration of queries." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add RunTime: measure duration of queries." />
+    <MESSAGE value="Pre re-factor cache." />
+    <option name="LAST_COMMIT_MESSAGE" value="Pre re-factor cache." />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

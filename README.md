@@ -8,12 +8,12 @@ This previous implementation was created for the paper [Differential Privacy and
 
 - [x] Java styleguide standardization (Google Java Format)
 - [x] A clean code
-- [ ] Theoretical optimization for the function:
-  - Let P(k) be a polynomial and _k_ in _\[0, graphSize\]_, **max Eˆ(-beta\*k)\*P(k)**
+- [x] Theoretical optimization for the function:
+  - Let P(k) be a polynomial and _k_ in _\[0, graphSize\]_, **max eˆ(-beta\ k)\*P(k)**
     - Improved calculating the derivatives for max and min values of the function, minimizing the iterations for maximize as a function of k.
 
 - [ ] Use of caches to improve the response time for differentially private queries.
-  - [ ] Cache for graph sizes results.
+  - [ ] Cache for differentially privacy queries.
   - [ ] Cache for most map values.
 
 

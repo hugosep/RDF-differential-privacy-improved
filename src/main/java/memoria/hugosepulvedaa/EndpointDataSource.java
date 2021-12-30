@@ -1,6 +1,7 @@
 package memoria.hugosepulvedaa;
 
-import com.google.common.cache.*;
+import com.github.benmanes.caffeine.cache.*;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import memoria.hugosepulvedaa.utils.Helper;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
@@ -11,8 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
+import java.util.concurrent.TimeUnit;
 
 /** @author cbuil */
 public class EndpointDataSource implements DataSource {
@@ -31,146 +31,146 @@ public class EndpointDataSource implements DataSource {
         this.EPSILON = EPSILON;
 
         DPQueriesCache =
-                CacheBuilder.newBuilder()
+                Caffeine.newBuilder()
                         .recordStats()
-                        .maximumWeight(100000)
-                        .weigher((Weigher<Query, DPQuery>) (k, v) -> (int) v.getExecutionTime())
+                        .maximumWeight(120)
+                        .weigher(
+                                (Weigher<Query, DPQuery>)
+                                        (k, v) -> (int) (v.getExecutionTime() / 1E9))
+                        .expireAfterAccess(120, TimeUnit.MINUTES)
                         .build(
-                                new CacheLoader<Query, DPQuery>() {
+                                key -> {
+                                    logger.info("into DPQueries CacheLoader, loading: " + key);
 
-                                    @Override
-                                    public DPQuery load(Query key) {
-                                        logger.info("into DPQueries CacheLoader, loading: " + key);
+                                    DPQuery dpQuery = new DPQuery();
 
-                                        DPQuery dpQuery = new DPQuery();
+                                    long startTime = System.nanoTime();
 
-                                        long startTime = System.nanoTime();
+                                    dpQuery.setModel(executeConstructQuery(key));
+                                    List<List<String>> triplePatterns = new ArrayList<>();
 
-                                        dpQuery.setModel(executeConstructQuery(key));
-                                        List<List<String>> triplePatterns = new ArrayList<>();
+                                    Map<String, List<TriplePath>> starQueriesMap =
+                                            Helper.getStarPatterns(key);
 
-                                        Map<String, List<TriplePath>> starQueriesMap =
-                                                Helper.getStarPatterns(key);
+                                    setMostFreqValueMaps(
+                                            dpQuery.getModel(),
+                                            dpQuery.getMostFrequentResults(),
+                                            key,
+                                            starQueriesMap,
+                                            triplePatterns);
 
-                                        setMostFreqValueMaps(
-                                                dpQuery.getModel(),
-                                                dpQuery.getMostFrequentResults(),
-                                                key,
-                                                starQueriesMap,
-                                                triplePatterns);
+                                    long graphSize =
+                                            calculateGraphSizeTriples(
+                                                    dpQuery.getModel(), triplePatterns);
 
-                                        long graphSize =
-                                                calculateGraphSizeTriples(
-                                                        dpQuery.getModel(), triplePatterns);
+                                    dpQuery.setGraphSizeTriples(graphSize);
 
-                                        dpQuery.setGraphSizeTriples(graphSize);
+                                    double DELTA = 1 / Math.pow(graphSize, 2);
+                                    double beta = EPSILON / (2 * Math.log(2 / DELTA));
 
-                                        double DELTA = 1 / Math.pow(graphSize, 2);
-                                        double beta = EPSILON / (2 * Math.log(2 / DELTA));
+                                    String elasticStability = "0";
+                                    int k = 0;
 
-                                        String elasticStability = "0";
-                                        int k = 0;
+                                    Sensitivity smoothSensitivity;
 
-                                        Sensitivity smoothSensitivity;
+                                    dpQuery.setIsStarQuery(Helper.isStarQuery(key));
 
-                                        dpQuery.setIsStarQuery(Helper.isStarQuery(key));
+                                    if (dpQuery.isStarQuery()) {
+                                        elasticStability = "x";
 
-                                        if (dpQuery.isStarQuery()) {
-                                            elasticStability = "x";
+                                        Sensitivity sensitivity =
+                                                new Sensitivity(1.0, elasticStability);
 
-                                            Sensitivity sensitivity =
-                                                    new Sensitivity(1.0, elasticStability);
+                                        smoothSensitivity =
+                                                GraphElasticSensitivity
+                                                        .smoothElasticSensitivityStar(
+                                                                elasticStability,
+                                                                sensitivity,
+                                                                beta,
+                                                                k);
 
-                                            smoothSensitivity =
-                                                    GraphElasticSensitivity
-                                                            .smoothElasticSensitivityStar(
-                                                                    elasticStability,
-                                                                    sensitivity,
-                                                                    beta,
-                                                                    k);
+                                        logger.info(
+                                                "Star query (smooth) sensitivity: "
+                                                        + smoothSensitivity.getSensitivity());
+                                        dpQuery.setElasticStability(elasticStability);
 
-                                            logger.info(
-                                                    "Star query (smooth) sensitivity: "
-                                                            + smoothSensitivity.getSensitivity());
-                                            dpQuery.setElasticStability(elasticStability);
+                                    } else {
+                                        List<StarQuery> listStars = new ArrayList<>();
 
-                                        } else {
-                                            List<StarQuery> listStars = new ArrayList<>();
-
-                                            for (List<TriplePath> tp : starQueriesMap.values()) {
-                                                listStars.add(new StarQuery(tp));
-                                            }
-
-                                            StarQuery sq =
-                                                    GraphElasticSensitivity.calculateSensitivity(
-                                                            EndpointDataSource.this,
-                                                            dpQuery.getMostFrequentResults(),
-                                                            listStars);
-
-                                            logger.info(
-                                                    "Elastic Stability: "
-                                                            + sq.getElasticStability());
-
-                                            smoothSensitivity =
-                                                    GraphElasticSensitivity
-                                                            .smoothElasticSensitivity(
-                                                                    sq.getElasticStability(),
-                                                                    0,
-                                                                    beta,
-                                                                    k,
-                                                                    graphSize);
-
-                                            logger.info(
-                                                    "Path Smooth Sensitivity: "
-                                                            + smoothSensitivity.getSensitivity());
-                                            dpQuery.setElasticStability(sq.getElasticStability());
+                                        for (List<TriplePath> tp : starQueriesMap.values()) {
+                                            listStars.add(new StarQuery(tp));
                                         }
-                                        logger.info("SmoothSensitivity:" + smoothSensitivity);
-                                        dpQuery.setSmoothSensitivity(smoothSensitivity);
 
-                                        // stopTime
-                                        long endTime = System.nanoTime();
-                                        long duration = (endTime - startTime);
-                                        double durationInSeconds = (double) (duration / 1000000000);
-                                        logger.info("Time: " + durationInSeconds + " seconds");
-                                        dpQuery.setExecutionTime(durationInSeconds);
-                                        return dpQuery;
+                                        StarQuery sq =
+                                                GraphElasticSensitivity.calculateSensitivity(
+                                                        EndpointDataSource.this,
+                                                        dpQuery.getMostFrequentResults(),
+                                                        listStars);
+
+                                        logger.info(
+                                                "Elastic Stability: " + sq.getElasticStability());
+
+                                        smoothSensitivity =
+                                                GraphElasticSensitivity.smoothElasticSensitivity(
+                                                        sq.getElasticStability(),
+                                                        0,
+                                                        beta,
+                                                        k,
+                                                        graphSize);
+
+                                        logger.info(
+                                                "Path Smooth Sensitivity: "
+                                                        + smoothSensitivity.getSensitivity());
+                                        dpQuery.setElasticStability(sq.getElasticStability());
                                     }
+                                    logger.info("SmoothSensitivity:" + smoothSensitivity);
+                                    dpQuery.setSmoothSensitivity(smoothSensitivity);
+
+                                    // stopTime
+                                    long endTime = System.nanoTime();
+                                    long duration = (endTime - startTime);
+                                    double durationInSeconds = (double) (duration / 1000000000);
+                                    logger.info("Time: " + durationInSeconds + " seconds");
+                                    logger.info("Time: " + duration + " nanoseconds");
+                                    dpQuery.setExecutionTime(durationInSeconds);
+                                    return dpQuery;
                                 });
 
         mostFrequentResultCache =
-                CacheBuilder.newBuilder()
+                Caffeine.newBuilder()
                         .recordStats()
-                        .maximumWeight(100000)
+                        .maximumWeight(10000)
                         .weigher(
                                 (Weigher<MaxFreqQuery, Integer>)
-                                        (k, resultSize) -> k.getQuerySize())
+                                        (k, resultSize) -> k.getNumberOfVariables())
+                        .expireAfterAccess(120, TimeUnit.MINUTES)
                         .build(
-                                new CacheLoader<MaxFreqQuery, Integer>() {
-                                    @Override
-                                    public Integer load(MaxFreqQuery s) {
-                                        logger.debug(
-                                                "into mostPopularValueCache CacheLoader, loading: "
-                                                        + s);
-                                        return getMostFrequentResult(
-                                                s.getQuery(), s.getVariableString());
-                                    }
+                                maxFreqQuery -> {
+                                    logger.debug(
+                                            "into mostPopularValueCache CacheLoader, loading: "
+                                                    + maxFreqQuery);
+                                    return getMostFrequentResult(
+                                            maxFreqQuery.getQuery(),
+                                            maxFreqQuery.getVariableString());
                                 });
     }
 
     public DPQuery getDPQuery(Query key) {
-        return DPQueriesCache.getUnchecked(key);
+        return DPQueriesCache.get(key);
     }
 
     @Override
     public long getGraphSize(Query query) {
-        return (DPQueriesCache.getUnchecked(query).getModel().size());
+        return (DPQueriesCache.get(query).getModel().size());
     }
 
     public Model executeConstructQuery(Query query) {
         Element queryPattern = query.getQueryPattern();
 
-        String cleanConstructQuery = queryPattern.toString().replaceAll("( *FILTER *(.*) *)", "");
+        String cleanConstructQuery =
+                queryPattern.toString().replaceAll(".\n *(FILTER *(.*) *)", ".");
+        cleanConstructQuery = cleanConstructQuery.replaceAll("(FILTER *(.*) *)", "");
+
         String constructQuery = "CONSTRUCT " + cleanConstructQuery + " WHERE " + queryPattern;
 
         logger.info("constructQuery: " + constructQuery);
@@ -208,7 +208,6 @@ public class EndpointDataSource implements DataSource {
     }
 
     public int executeCountQueryInternal(Model model, String queryString) {
-
         Query query = QueryFactory.create(queryString);
 
         // no entiendo por que esta esto
@@ -238,7 +237,7 @@ public class EndpointDataSource implements DataSource {
     */
     @Override
     public Long getGraphSizeTriples(Query query) {
-        return (DPQueriesCache.getUnchecked(query).getGraphSizeTriples());
+        return (DPQueriesCache.get(query).getGraphSizeTriples());
     }
 
     public Long calculateGraphSizeTriples(Model model, List<List<String>> triplePatternsCount) {
@@ -266,14 +265,7 @@ public class EndpointDataSource implements DataSource {
 
     @Override
     public int mostFrequentResult(MaxFreqQuery maxFreqQuery) {
-        try {
-            return this.mostFrequentResultCache.get(maxFreqQuery);
-
-        } catch (ExecutionException ex) {
-            java.util.logging.Logger.getLogger(EndpointDataSource.class.getName())
-                    .log(Level.SEVERE, null, ex);
-            return -1;
-        }
+        return this.mostFrequentResultCache.get(maxFreqQuery);
     }
 
     @Override

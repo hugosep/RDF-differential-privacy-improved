@@ -1,2 +1,0 @@
-resources/wikidata_queries/working/F4.rq
-resources/wikidata_queries/working/L3.rq

@@ -76,13 +76,12 @@ public class RunTimeCache {
 
                 logger.info("Running analysis to DIRECTORY: " + queryLocation);
 
-                File planCache = new File("resources/wikidata_queries/planCache1.txt");
+                File planCache = new File("resources/wikidata_queries/planCache.txt");
                 Scanner reader = new Scanner(planCache);
 
                 while (reader.hasNextLine()) {
 
                     Path chosenFile = Paths.get(reader.nextLine());
-
                     logger.info("Running analysis to query: " + chosenFile);
 
                     queryString = new Scanner(chosenFile).useDelimiter("\\Z").next();
@@ -96,7 +95,7 @@ public class RunTimeCache {
                                 evaluation,
                                 EPSILON);
                     } catch (Exception e) {
-                        logger.error(e.toString());
+                        System.out.println(e.getMessage());
                     }
                 }
 
@@ -109,7 +108,10 @@ public class RunTimeCache {
                         System.out.println("File already exists.");
                     }
 
-                    String cacheStats = "DPQueriesCacheStats: " + dataSource.getDPQueriesCache().toString() + "\n";
+                    String cacheStats =
+                            "DPQueriesCacheStats: "
+                                    + dataSource.getDPQueriesCache().toString()
+                                    + "\n";
 
                     Files.write(
                             Paths.get("fileCacheStats.txt"),
@@ -118,7 +120,10 @@ public class RunTimeCache {
 
                     logger.info("graphSizeCacheStats: " + cacheStats);
 
-                    cacheStats = "mostFrequentResultCacheStats: " + dataSource.getMostFrequentResultCache().toString() + "\n";
+                    cacheStats =
+                            "mostFrequentResultCacheStats: "
+                                    + dataSource.getMostFrequentResultCache().toString()
+                                    + "\n";
 
                     Files.write(
                             Paths.get("fileCacheStats.txt"),

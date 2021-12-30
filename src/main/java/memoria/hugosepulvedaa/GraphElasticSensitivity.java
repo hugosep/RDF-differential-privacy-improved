@@ -159,15 +159,11 @@ public class GraphElasticSensitivity {
 
         Sensitivity sensitivity = new Sensitivity(prevSensitivity, elasticSensitivity);
 
-        /*Func f1 = new Func("f1", elasticSensitivity);
-        BytecodeFunc func1 = f1.toBytecodeFunc();
-        */
-
-        // System.out.println("f1:" + f1);
-
         // this can be minor
         short a = 100;
         ExprEvaluator util = new ExprEvaluator(false, a);
+
+        // NSolve function uses Laguerre's method, returning real and complex solutions
         IExpr result = util.eval("diff(E^(-" + beta + "*x)*" + elasticSensitivity + ",x)");
         result = util.eval("NSolve(0==" + result.toString() + ",x)");
         String strResult = result.toString();
@@ -181,8 +177,8 @@ public class GraphElasticSensitivity {
 
             /* OPTIMIZATION
              * If we maximize E^(-beta*x)*P(x), where P(x) is a polynomial.
-             * The maximal value can be determined finding the max maximal of the function, where it is decreasing to
-             * infinite.
+             * The maximal value can be determined finding the max maximal
+             * of the function, where it is decreasing to infinite.
              */
 
             strResult = strResult.substring(1, strResult.length() - 1);
@@ -190,9 +186,11 @@ public class GraphElasticSensitivity {
             String[] arrayZeros = strResult.split(",");
             List<String> listStrZeros = new ArrayList<>(Arrays.asList(arrayZeros));
 
+            // clean the string returned
             listStrZeros.replaceAll(zero -> zero.substring(1, zero.length() - 1));
             listStrZeros.replaceAll(zero -> zero.substring(3));
 
+            // remove complex solutions
             listStrZeros.removeIf(zero -> zero.contains("I"));
             listStrZeros.removeIf(zero -> zero.contains("i"));
 
@@ -212,8 +210,8 @@ public class GraphElasticSensitivity {
         }
 
         for (int i = k; i <= ceilMaxCandidate; i++) {
-            result = util.eval("Function({x}, " + elasticSensitivity + ")[1]");
-            // double kPrime = func1.apply(i);
+            result = util.eval("Function({x}, " + elasticSensitivity + ")[" + i + "]");
+
             double kPrime = util.evalf(result);
             double smoothSensitivity = Math.exp(-i * beta) * kPrime;
 
@@ -230,7 +228,10 @@ public class GraphElasticSensitivity {
     }
 
     public static Sensitivity smoothElasticSensitivityStar(
-            String elasticSensitivity, Sensitivity prevSensitivity, double beta, int k) {
+            String elasticSensitivity,
+            Sensitivity prevSensitivity,
+            double beta,
+            int k) {
 
         /* OPTIMIZATION
          * It doesn't make sense iterate for f(x)=E^(-beta*x), because the function is a decreasing
@@ -243,7 +244,8 @@ public class GraphElasticSensitivity {
         Sensitivity smoothSensitivity = new Sensitivity(exponentialPart, elasticSensitivity);
         smoothSensitivity.setMaxK(k);
 
-        if (smoothSensitivity.getSensitivity() > prevSensitivity.getSensitivity()) {
+        if (smoothSensitivity.getSensitivity() > prevSensitivity.getSensitivity())
+        {
             return smoothSensitivity;
         }
 

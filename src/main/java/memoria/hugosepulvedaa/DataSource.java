@@ -5,7 +5,7 @@
  */
 package memoria.hugosepulvedaa;
 
-import com.google.common.cache.CacheStats;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import org.apache.jena.query.Query;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.core.TriplePath;
