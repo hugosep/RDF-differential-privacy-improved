@@ -4,10 +4,8 @@ import com.github.benmanes.caffeine.cache.*;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import memoria.hugosepulvedaa.utils.Helper;
 import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.sparql.core.TriplePath;
-import org.apache.jena.sparql.syntax.Element;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,12 +21,24 @@ public class EndpointDataSource implements DataSource {
     private final LoadingCache<MaxFreqQuery, Integer> mostFrequentResultCache;
     private static final Map<String, List<Integer>> mapMostFreqValue = new HashMap<>();
     private static final Map<String, List<StarQuery>> mapMostFreqValueStar = new HashMap<>();
-    private double EPSILON;
+    private final long graphSize;
 
     public EndpointDataSource(String endpoint, double EPSILON) {
 
         dataSource = endpoint;
-        this.EPSILON = EPSILON;
+        String stringGraphSize = "SELECT (COUNT(*) as ?triples) WHERE {?s ?p ?o}";
+        Query query = QueryFactory.create(stringGraphSize);
+
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(dataSource, query);
+
+        ResultSet results = qexec.execSelect();
+        QuerySolution soln = results.nextSolution();
+        logger.info("Count query executed... ");
+
+        RDFNode x = soln.get(soln.varNames().next());
+        graphSize = x.asLiteral().getLong();
+
+        qexec.close();
 
         DPQueriesCache =
                 Caffeine.newBuilder()
@@ -46,27 +56,23 @@ public class EndpointDataSource implements DataSource {
 
                                     long startTime = System.nanoTime();
 
-                                    dpQuery.setModel(executeConstructQuery(key));
                                     List<List<String>> triplePatterns = new ArrayList<>();
 
                                     Map<String, List<TriplePath>> starQueriesMap =
                                             Helper.getStarPatterns(key);
 
                                     setMostFreqValueMaps(
-                                            dpQuery.getModel(),
                                             dpQuery.getMostFrequentResults(),
                                             key,
                                             starQueriesMap,
                                             triplePatterns);
 
-                                    long graphSize =
-                                            calculateGraphSizeTriples(
-                                                    dpQuery.getModel(), triplePatterns);
-
-                                    dpQuery.setGraphSizeTriples(graphSize);
+                                    dpQuery.setGraphSizeTriples(this.graphSize);
 
                                     double DELTA = 1 / Math.pow(graphSize, 2);
                                     double beta = EPSILON / (2 * Math.log(2 / DELTA));
+
+                                    dpQuery.setDelta(DELTA);
 
                                     String elasticStability = "0";
                                     int k = 0;
@@ -160,27 +166,8 @@ public class EndpointDataSource implements DataSource {
     }
 
     @Override
-    public long getGraphSize(Query query) {
-        return (DPQueriesCache.get(query).getModel().size());
-    }
-
-    public Model executeConstructQuery(Query query) {
-        Element queryPattern = query.getQueryPattern();
-
-        String cleanConstructQuery =
-                queryPattern.toString().replaceAll(".\n *(FILTER *(.*) *)", ".");
-        cleanConstructQuery = cleanConstructQuery.replaceAll("(FILTER *(.*) *)", "");
-
-        String constructQuery = "CONSTRUCT " + cleanConstructQuery + " WHERE " + queryPattern;
-
-        logger.info("constructQuery: " + constructQuery);
-
-        try (QueryExecution qexec =
-                QueryExecutionFactory.sparqlService(dataSource, constructQuery)) {
-            Model model = qexec.execConstruct();
-            qexec.close();
-            return model;
-        }
+    public long getGraphSize() {
+        return (this.graphSize);
     }
 
     @Override
@@ -207,60 +194,12 @@ public class EndpointDataSource implements DataSource {
         return countResult;
     }
 
-    public int executeCountQueryInternal(Model model, String queryString) {
-        Query query = QueryFactory.create(queryString);
-
-        // no entiendo por que esta esto
-        if (queryString.contains("http://www.wikidata.org/prop/direct/P31")
-                && (queryString.lastIndexOf('?') != queryString.indexOf('?'))) {
-            return 85869721;
-        }
-
-        QueryExecution qexec = QueryExecutionFactory.create(query, model);
-
-        ResultSet results = qexec.execSelect();
-        QuerySolution soln = results.nextSolution();
-
-        logger.info("Count query executed... ");
-
-        qexec.close();
-
-        RDFNode x = soln.get(soln.varNames().next());
-        int countResult = x.asLiteral().getInt();
-
-        logger.info("Count query result (endpoint): " + countResult);
-        return countResult;
-    }
-
     /*
        @description Sum all COUNTs of every generated query.
     */
     @Override
-    public Long getGraphSizeTriples(Query query) {
-        return (DPQueriesCache.get(query).getGraphSizeTriples());
-    }
-
-    public Long calculateGraphSizeTriples(Model model, List<List<String>> triplePatternsCount) {
-
-        long count = 0L;
-
-        // triplePatternsCount has all triples generated by setMostFreqValueMaps method
-        for (List<String> star : triplePatternsCount) {
-
-            StringBuilder construct = new StringBuilder();
-
-            for (String tp : star) {
-                construct.append(tp).append(" . ");
-            }
-
-            logger.info("Construct query for graph size so far: " + construct);
-            count +=
-                    executeCountQueryInternal(
-                            model, "SELECT (COUNT(*) as ?count) WHERE { " + construct + "} ");
-            logger.info("Graph size so far: " + count);
-        }
-        logger.info("count: " + count);
-        return count;
+    public Long getGraphSizeTriples() {
+        return(this.graphSize);
     }
 
     @Override
@@ -270,7 +209,6 @@ public class EndpointDataSource implements DataSource {
 
     @Override
     public void setMostFreqValueMaps(
-            Model model,
             HashMap<MaxFreqQuery, Integer> mostFrequentResults,
             Query originalQuery,
             Map<String, List<TriplePath>> starQueriesMap,

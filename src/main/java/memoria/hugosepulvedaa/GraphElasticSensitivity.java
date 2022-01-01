@@ -164,7 +164,10 @@ public class GraphElasticSensitivity {
         ExprEvaluator util = new ExprEvaluator(false, a);
 
         // NSolve function uses Laguerre's method, returning real and complex solutions
-        IExpr result = util.eval("diff(E^(-" + beta + "*x)*" + elasticSensitivity + ",x)");
+        String differential = "diff(E^(-" + beta + "*x)*" + elasticSensitivity + ",x)";
+        logger.info("Differential: " + differential);
+
+        IExpr result = util.eval(differential);
         result = util.eval("NSolve(0==" + result.toString() + ",x)");
         String strResult = result.toString();
 

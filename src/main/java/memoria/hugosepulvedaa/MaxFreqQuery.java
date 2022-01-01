@@ -44,7 +44,6 @@ public class MaxFreqQuery {
     }*/
 
     private int numberOfVariables(String strQuery) {
-        System.out.println("aaa: " + strQuery);
         Pattern variable = Pattern.compile("\\?\\w+", Pattern.CASE_INSENSITIVE);
         Matcher matcher = variable.matcher(strQuery);
         HashSet<String> variables = new HashSet<>();

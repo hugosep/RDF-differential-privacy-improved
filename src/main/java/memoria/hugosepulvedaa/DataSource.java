@@ -20,18 +20,17 @@ public interface DataSource {
 
     DPQuery getDPQuery(Query query);
 
-    long getGraphSize(Query query);
+    long getGraphSize();
 
     int executeCountQuery(String queryString, boolean principal);
 
-    Long getGraphSizeTriples(Query query);
+    Long getGraphSizeTriples();
 
     int getMostFrequentResult(String starQuery, String variableName);
 
     int mostFrequentResult(MaxFreqQuery maxFreqQuery);
 
     void setMostFreqValueMaps(
-            Model model,
             HashMap<MaxFreqQuery, Integer> mostFrequentResults,
             Query originalQuery,
             Map<String, List<TriplePath>> starQueriesMap,

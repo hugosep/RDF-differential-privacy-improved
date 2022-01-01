@@ -12,9 +12,9 @@ This previous implementation was created for the paper [Differential Privacy and
   - Let P(k) be a polynomial and _k_ in _\[0, graphSize\]_, **max eˆ(-beta\ k)\*P(k)**
     - Improved calculating the derivatives for max and min values of the function, minimizing the iterations for maximize as a function of k.
 
-- [ ] Use of caches to improve the response time for differentially private queries.
-  - [ ] Cache for differentially privacy queries.
-  - [ ] Cache for most map values.
+- [x] Use of caches to improve the response time for differentially private queries.
+  - [x] Cache for differentially privacy queries.
+  - [x] Cache for most map values.
 
 
 ## How to use
