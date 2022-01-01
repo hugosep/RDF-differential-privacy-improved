@@ -1,9 +1,5 @@
 package memoria.hugosepulvedaa;
 
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryFactory;
-
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,10 +13,6 @@ public class MaxFreqQuery {
         this.query = tp;
         this.variable = var;
         this.numberOfVariables = numberOfVariables(query);
-    }
-
-    public int getQuerySize() {
-        return query.length();
     }
 
     public String getQuery() {
