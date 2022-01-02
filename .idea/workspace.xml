@@ -4,30 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2c4b3c1a-d253-4ec3-a949-86e1468970ea" name="Changes" comment="Pre re-factor cache.">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/github_ben_manes_caffeine.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/SymJava_1_1_2.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/apache_jena_arq.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/apache_jena_core.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/google_guava.xml" beforeDir="false" />
+    <list default="true" id="2c4b3c1a-d253-4ec3-a949-86e1468970ea" name="Changes" comment="Minor changes.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RDF-differential-privacy-improved.iml" beforeDir="false" afterPath="$PROJECT_DIR$/RDF-differential-privacy-improved.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/fileTimeCache.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/fileTimeCache.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/outTest/L5.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/TestOut/L5.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/outTest/S5prime.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/TestOut/S5prime.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/planCache.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/planCache1.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/F1.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/F1.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/F2.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/F2.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/F6.rq" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/S2.rq" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/HDTDataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/HDTDataSource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/MaxFreqQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/MaxFreqQuery.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTimeCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTimeCache.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,6 +21,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="initial_graph_size" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitSEFilterConfiguration">
@@ -108,7 +92,7 @@
       <recent name="memoria.hugosepulvedaa" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.RunTimeCache">
+  <component name="RunManager" selected="Application.RunSymbolic">
     <configuration name="RunSymbolic" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="memoria.hugosepulvedaa.Run.RunSymbolic" />
       <module name="RDF-differential-privacy-improved" />
@@ -153,6 +137,7 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.MaxFreqQueryTest" />
         <item itemvalue="JUnit.MaxFreqQueryTest" />
       </list>
     </recent_temporary>
@@ -369,7 +354,21 @@
       <option name="project" value="LOCAL" />
       <updated>1639782076401</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="v1.0.">
+      <created>1640824683183</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1640824683184</updated>
+    </task>
+    <task id="LOCAL-00031" summary="initial_graph_size: unique graphSize in constructor of EndpointdataSource, delete function graphTripleSize by variables.">
+      <created>1641018909367</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1641018909367</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -402,7 +401,10 @@
     <MESSAGE value="Final cache: model, graphSizeTriples, isStarQuery, EPSILON, beta, delta, elasticStability, smoothSensitivity." />
     <MESSAGE value="Add RunTime: measure duration of queries." />
     <MESSAGE value="Pre re-factor cache." />
-    <option name="LAST_COMMIT_MESSAGE" value="Pre re-factor cache." />
+    <MESSAGE value="v1.0." />
+    <MESSAGE value="v1.0.1 - Minor changes, comments added." />
+    <MESSAGE value="initial_graph_size: unique graphSize in constructor of EndpointdataSource, delete function graphTripleSize by variables." />
+    <option name="LAST_COMMIT_MESSAGE" value="initial_graph_size: unique graphSize in constructor of EndpointdataSource, delete function graphTripleSize by variables." />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -67,6 +67,8 @@ public class EndpointDataSource implements DataSource {
 
                                     double DELTA = 1 / Math.pow(graphSize, 2);
                                     double beta = EPSILON / (2 * Math.log(2 / DELTA));
+                                    dpQuery.setDelta(DELTA);
+                                    dpQuery.setBeta(beta);
 
                                     String elasticStability = "0";
                                     int k = 0;
