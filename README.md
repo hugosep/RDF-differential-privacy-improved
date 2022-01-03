@@ -12,25 +12,25 @@ This previous implementation was created for the paper [Differential Privacy and
   - Let P(k) be a polynomial and _k_ in _\[0, graphSize\]_, **max eˆ(-beta\ k)\*P(k)**
     - Improved calculating the derivatives for max and min values of the function, minimizing the iterations for maximize as a function of k.
 
-- [ ] Use of caches to improve the response time for differentially private queries.
-  - [ ] Cache for differentially privacy queries.
-  - [ ] Cache for most map values.
+- [x] Use of caches to improve the response time for differentially private queries.
+  - [x] Cache for differentially privacy queries.
+  - [x] Cache for most map values.
 
 
 ## How to use
 
 ### First, install/add the next dependencies:
 In Maven:
-- google.code.gson:2.8.9
-- rdfhdt.hdt.jena:2.1.2
-- rdfhdt.hdt.java.core:2.1.2
-- apache.jena.core:3.7.0
-- google.guava:2.8.9
-- apache.jena.arq:3.7.0
-- apache.logging.log4j.core:2.14.1
+- com.google.code.gson:gson:2.8.9
+- org.rdfhdt:hdt-jena:2.1.2
+- org.rdfhdt:hdt-java-core:2.1.2
+- org.apache.jena:jena-core:3.7.0
+- com.google.guava:guava:31.0.1-jre
+- org.apache.jena:jena-arq:3.7.0
+- com.github.ben-manes.caffeine:caffeine:3.0.5
+- org.apache.logging.log4j:log4j-core:2.16.0
 
 In _lib_ folder:
-- SymJava-1.1.2 ([Github](https://github.com/yuemingl/SymJava))
 - matheclipse-core ([Github](https://github.com/axkr/symja_android_library), compiled 9-nov-2021)
 
 ### Next, see the README in Run folder:

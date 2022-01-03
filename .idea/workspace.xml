@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2c4b3c1a-d253-4ec3-a949-86e1468970ea" name="Changes" comment="Minor changes.">
+    <list default="true" id="2c4b3c1a-d253-4ec3-a949-86e1468970ea" name="Changes" comment="Bug fixed: Delta not setted in dpQuery.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -368,7 +368,14 @@
       <option name="project" value="LOCAL" />
       <updated>1641018909367</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Bug fixed: Delta not setted in dpQuery.">
+      <created>1641086062614</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1641086062614</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -404,7 +411,8 @@
     <MESSAGE value="v1.0." />
     <MESSAGE value="v1.0.1 - Minor changes, comments added." />
     <MESSAGE value="initial_graph_size: unique graphSize in constructor of EndpointdataSource, delete function graphTripleSize by variables." />
-    <option name="LAST_COMMIT_MESSAGE" value="initial_graph_size: unique graphSize in constructor of EndpointdataSource, delete function graphTripleSize by variables." />
+    <MESSAGE value="Bug fixed: Delta not setted in dpQuery." />
+    <option name="LAST_COMMIT_MESSAGE" value="Bug fixed: Delta not setted in dpQuery." />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
