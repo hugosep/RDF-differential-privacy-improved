@@ -76,9 +76,9 @@ public class RunQuery {
 
             if (cmd.hasOption("f")) {
                 System.out.println("Endpoint");
-                endpointDataSource = new EndpointDataSource(endpoint, EPSILON);
+                endpointDataSource = new EndpointDataSource(endpoint);
             } else {
-                hdtDataSource = new HDTDataSource(queryString, EPSILON);
+                hdtDataSource = new HDTDataSource(queryString);
             }
 
             Path queryLocation = Paths.get(queryString);
@@ -90,8 +90,6 @@ public class RunQuery {
 
                 logger.info("queryString: " + queryString);
 
-                // Query query = QueryFactory.create(queryString);
-                // ResultSet rs;
                 int result;
 
                 if (cmd.hasOption("f")) {
@@ -100,16 +98,6 @@ public class RunQuery {
                     result = hdtDataSource.executeCountQuery(queryString, true);
                 }
 
-                /* int i = 0;
-
-                while (rs.hasNext()) {
-                    logger.info(
-                            ((ResultBinding) rs.next())
-                                    .getBinding()
-                                    .get(query.getProjectVars().get(0)));
-                    i++;
-                }
-                 */
                 logger.info("results: " + result);
             }
         } catch (IOException e1) {

@@ -21,14 +21,10 @@ public class EndpointDataSource implements DataSource {
     private final String dataSource;
     private static LoadingCache<Query, DPQuery> DPQueriesCache;
     private final LoadingCache<MaxFreqQuery, Integer> mostFrequentResultCache;
-    private static final Map<String, List<Integer>> mapMostFreqValue = new HashMap<>();
-    private static final Map<String, List<StarQuery>> mapMostFreqValueStar = new HashMap<>();
-    private double EPSILON;
 
-    public EndpointDataSource(String endpoint, double EPSILON) {
+    public EndpointDataSource(String endpoint) {
 
         dataSource = endpoint;
-        this.EPSILON = EPSILON;
 
         DPQueriesCache =
                 Caffeine.newBuilder()
@@ -37,104 +33,65 @@ public class EndpointDataSource implements DataSource {
                         .weigher(
                                 (Weigher<Query, DPQuery>)
                                         (k, v) -> (int) (v.getExecutionTime() / 1E9))
-                        .expireAfterAccess(120, TimeUnit.MINUTES)
+                        .expireAfterAccess(1, TimeUnit.HOURS)
                         .build(
                                 key -> {
                                     logger.info("into DPQueries CacheLoader, loading: " + key);
 
-                                    DPQuery dpQuery = new DPQuery();
-
                                     long startTime = System.nanoTime();
 
+                                    DPQuery dpQuery = new DPQuery();
+
                                     dpQuery.setModel(executeConstructQuery(key));
+
+                                    dpQuery.setStarQueriesMap(Helper.getStarPatterns(key));
+
                                     List<List<String>> triplePatterns = new ArrayList<>();
+                                    dpQuery.setTriplePatterns(triplePatterns);
 
-                                    Map<String, List<TriplePath>> starQueriesMap =
-                                            Helper.getStarPatterns(key);
+                                    setMostFreqValueMaps(dpQuery);
 
-                                    setMostFreqValueMaps(
-                                            dpQuery.getModel(),
-                                            dpQuery.getMostFrequentResults(),
-                                            key,
-                                            starQueriesMap,
-                                            triplePatterns);
-
-                                    long graphSize =
+                                    /*long graphSize =
                                             calculateGraphSizeTriples(
-                                                    dpQuery.getModel(), triplePatterns);
+                                                    dpQuery.getModel(),
+                                                    dpQuery.getTriplePatterns());*/
 
-                                    dpQuery.setGraphSizeTriples(graphSize);
-
-                                    double DELTA = 1 / Math.pow(graphSize, 2);
-                                    double beta = EPSILON / (2 * Math.log(2 / DELTA));
-                                    dpQuery.setDelta(DELTA);
-                                    dpQuery.setBeta(beta);
-
-                                    String elasticStability = "0";
-                                    int k = 0;
-
-                                    Sensitivity smoothSensitivity;
+                                    dpQuery.setGraphSizeTriples(dpQuery.getModel().size());
 
                                     dpQuery.setIsStarQuery(Helper.isStarQuery(key));
 
-                                    if (dpQuery.isStarQuery()) {
-                                        elasticStability = "x";
+                                    logger.info("listStars:" + dpQuery.getListStars());
 
-                                        Sensitivity sensitivity =
-                                                new Sensitivity(1.0, elasticStability);
-
-                                        smoothSensitivity =
-                                                GraphElasticSensitivity
-                                                        .smoothElasticSensitivityStar(
-                                                                elasticStability,
-                                                                sensitivity,
-                                                                beta,
-                                                                k);
-
-                                        logger.info(
-                                                "Star query (smooth) sensitivity: "
-                                                        + smoothSensitivity.getSensitivity());
-                                        dpQuery.setElasticStability(elasticStability);
-
-                                    } else {
+                                    if (!dpQuery.isStarQuery()) {
                                         List<StarQuery> listStars = new ArrayList<>();
 
-                                        for (List<TriplePath> tp : starQueriesMap.values()) {
+                                        for (List<TriplePath> tp :
+                                                dpQuery.getStarQueriesMap().values()) {
                                             listStars.add(new StarQuery(tp));
                                         }
 
-                                        StarQuery sq =
+                                        dpQuery.setListStars(listStars);
+
+                                        StarQuery starQuery =
                                                 GraphElasticSensitivity.calculateSensitivity(
                                                         EndpointDataSource.this,
                                                         dpQuery.getMostFrequentResults(),
-                                                        listStars);
+                                                        new ArrayList<>(dpQuery.getListStars()));
+
+                                        dpQuery.setStarQuery(starQuery);
 
                                         logger.info(
-                                                "Elastic Stability: " + sq.getElasticStability());
-
-                                        smoothSensitivity =
-                                                GraphElasticSensitivity.smoothElasticSensitivity(
-                                                        sq.getElasticStability(),
-                                                        0,
-                                                        beta,
-                                                        k,
-                                                        graphSize);
-
-                                        logger.info(
-                                                "Path Smooth Sensitivity: "
-                                                        + smoothSensitivity.getSensitivity());
-                                        dpQuery.setElasticStability(sq.getElasticStability());
+                                                "Elastic Stability: "
+                                                        + starQuery.getElasticStability());
                                     }
-                                    logger.info("SmoothSensitivity:" + smoothSensitivity);
-                                    dpQuery.setSmoothSensitivity(smoothSensitivity);
 
                                     // stopTime
                                     long endTime = System.nanoTime();
                                     long duration = (endTime - startTime);
-                                    double durationInSeconds = (double) (duration / 1000000000);
-                                    logger.info("Time: " + durationInSeconds + " seconds");
+                                    double durationInSeconds = duration / 1E9;
                                     logger.info("Time: " + duration + " nanoseconds");
                                     dpQuery.setExecutionTime(durationInSeconds);
+
                                     return dpQuery;
                                 });
 
@@ -145,7 +102,7 @@ public class EndpointDataSource implements DataSource {
                         .weigher(
                                 (Weigher<MaxFreqQuery, Integer>)
                                         (k, resultSize) -> k.getNumberOfVariables())
-                        .expireAfterAccess(120, TimeUnit.MINUTES)
+                        .expireAfterAccess(1, TimeUnit.HOURS)
                         .build(
                                 maxFreqQuery -> {
                                     logger.debug(
@@ -271,23 +228,17 @@ public class EndpointDataSource implements DataSource {
     }
 
     @Override
-    public void setMostFreqValueMaps(
-            Model model,
-            HashMap<MaxFreqQuery, Integer> mostFrequentResults,
-            Query originalQuery,
-            Map<String, List<TriplePath>> starQueriesMap,
-            List<List<String>> triplePatterns) {
+    public void setMostFreqValueMaps(DPQuery dpQuery) {
 
-        Map<String, List<Integer>> mapMostFreqValue = new HashMap<>();
-        Map<String, List<StarQuery>> mapMostFreqValueStar = new HashMap<>();
+        HashMap<MaxFreqQuery, Integer> mostFrequentResults = dpQuery.getMostFrequentResults();
+        Map<String, List<TriplePath>> starQueriesMap = dpQuery.getStarQueriesMap();
+        List<List<String>> triplePatterns = dpQuery.getTriplePatterns();
 
-        // EDITED
         logger.info("StarQueriesMap: " + starQueriesMap);
         logger.info("triplePatterns: " + triplePatterns);
 
         for (String key : starQueriesMap.keySet()) {
 
-            // EDITED
             logger.info("Key: " + key);
 
             List<String> listTriple = new ArrayList<>();
@@ -318,7 +269,6 @@ public class EndpointDataSource implements DataSource {
                 }
                 i++;
 
-                // EDITED
                 logger.info("Triple: " + triple);
 
                 listTriple.add(triple);
@@ -332,6 +282,10 @@ public class EndpointDataSource implements DataSource {
 
                 MaxFreqQuery query =
                         new MaxFreqQuery(Helper.getStarQueryString(starQueryLeft), var);
+
+                Map<String, List<Integer>> mapMostFreqValue = dpQuery.getMapMostFreqValues();
+                Map<String, List<StarQuery>> mapMostFreqValueStar =
+                        dpQuery.getMapMostFreqValuesStar();
 
                 if (mapMostFreqValue.containsKey(var)) {
                     List<Integer> mostFreqValues = mapMostFreqValue.get(var);
@@ -366,13 +320,13 @@ public class EndpointDataSource implements DataSource {
     }
 
     @Override
-    public Map<String, List<StarQuery>> getMapMostFreqValueStar() {
-        return mapMostFreqValueStar;
+    public Map<String, List<StarQuery>> getMapMostFreqValuesStar(Query query) {
+        return DPQueriesCache.get(query).getMapMostFreqValuesStar();
     }
 
     @Override
-    public Map<String, List<Integer>> getMapMostFreqValue() {
-        return mapMostFreqValue;
+    public Map<String, List<Integer>> getMapMostFreqValues(Query query) {
+        return DPQueriesCache.get(query).getMapMostFreqValues();
     }
 
     @Override

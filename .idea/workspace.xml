@@ -4,9 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2c4b3c1a-d253-4ec3-a949-86e1468970ea" name="Changes" comment="Bug fixed: Delta not setted in dpQuery.">
+    <list default="true" id="2c4b3c1a-d253-4ec3-a949-86e1468970ea" name="Changes" comment="Fixed: can change epsilon.">
+      <change afterPath="$PROJECT_DIR$/fileCacheStats.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fileTime.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DPQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DPQuery.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/HDTDataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/HDTDataSource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/MaxFreqQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/MaxFreqQuery.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/Result.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/Result.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunQuery.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunSymbolic.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunSymbolic.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTime.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTime.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTimeCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTimeCache.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,7 +36,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="initial_graph_size" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -37,7 +50,6 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTimeCache.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTime.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" root0="FORCE_HIGHLIGHTING" />
@@ -92,7 +104,7 @@
       <recent name="memoria.hugosepulvedaa" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.RunSymbolic">
+  <component name="RunManager" selected="Application.RunTimeCache">
     <configuration name="RunSymbolic" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="memoria.hugosepulvedaa.Run.RunSymbolic" />
       <module name="RDF-differential-privacy-improved" />
@@ -105,7 +117,7 @@
     <configuration name="RunTime" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="memoria.hugosepulvedaa.Run.RunTime" />
       <module name="RDF-differential-privacy-improved" />
-      <option name="PROGRAM_PARAMETERS" value="-endpoint https://query.wikidata.org/sparql -e resources/wikidata_queries/working -o output " />
+      <option name="PROGRAM_PARAMETERS" value="-endpoint https://query.wikidata.org/sparql -e resources/wikidata_queries/working/ -o output " />
       <option name="VM_PARAMETERS" value="-Dlog4j2.info=true" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -115,7 +127,6 @@
       <option name="MAIN_CLASS_NAME" value="memoria.hugosepulvedaa.Run.RunTimeCache" />
       <module name="RDF-differential-privacy-improved" />
       <option name="PROGRAM_PARAMETERS" value="-endpoint https://query.wikidata.org/sparql -e resources/wikidata_queries/working -o output " />
-      <option name="VM_PARAMETERS" value="-Dlog4j2.info=true" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -137,6 +148,8 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.MaxFreqQueryTest" />
+        <item itemvalue="JUnit.MaxFreqQueryTest" />
         <item itemvalue="JUnit.MaxFreqQueryTest" />
         <item itemvalue="JUnit.MaxFreqQueryTest" />
       </list>
@@ -375,7 +388,14 @@
       <option name="project" value="LOCAL" />
       <updated>1641086062614</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="Dependencies fixed.">
+      <created>1641253935114</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1641253935114</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -412,7 +432,9 @@
     <MESSAGE value="v1.0.1 - Minor changes, comments added." />
     <MESSAGE value="initial_graph_size: unique graphSize in constructor of EndpointdataSource, delete function graphTripleSize by variables." />
     <MESSAGE value="Bug fixed: Delta not setted in dpQuery." />
-    <option name="LAST_COMMIT_MESSAGE" value="Bug fixed: Delta not setted in dpQuery." />
+    <MESSAGE value="Dependencies fixed." />
+    <MESSAGE value="Fixed: can change epsilon." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed: can change epsilon." />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

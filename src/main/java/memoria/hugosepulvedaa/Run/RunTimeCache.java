@@ -18,10 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class RunTimeCache {
@@ -51,9 +48,9 @@ public class RunTimeCache {
 
         try {
             if (is_endpoint) {
-                dataSource = new EndpointDataSource(endpoint, EPSILON);
+                dataSource = new EndpointDataSource(endpoint);
             } else {
-                dataSource = new HDTDataSource(dataFile, EPSILON);
+                dataSource = new HDTDataSource(dataFile);
             }
 
             Path queryLocation = Paths.get(queryFile);
@@ -70,10 +67,17 @@ public class RunTimeCache {
                                 .filter(p -> p.toString().endsWith(".rq"))
                                 .collect(Collectors.toList());
 
+                HashMap<String, List<Double>> epsilons = new HashMap<>();
+
                 for (Path filePath : filesPath) {
                     mapTimes.put(filePath.toString(), new ArrayList<>());
+                    epsilons.put(
+                            filePath.toString(),
+                            new ArrayList<>(
+                                    Arrays.asList(
+                                            1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1)));
                 }
-
+                // 1.3, 1.1, 0.9, 0.65, 0.6, 0.4, 0.3, 0.2, 0.15, 0.1
                 logger.info("Running analysis to DIRECTORY: " + queryLocation);
 
                 File planCache = new File("resources/wikidata_queries/planCache.txt");
@@ -93,10 +97,11 @@ public class RunTimeCache {
                                 dataSource,
                                 outputFile,
                                 evaluation,
-                                EPSILON);
+                                epsilons.get(chosenFile.toString()).get(0));
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
                     }
+                    epsilons.get(chosenFile.toString()).remove(0);
                 }
 
                 try {
@@ -207,14 +212,41 @@ public class RunTimeCache {
             DPQuery dpQuery = dataSource.getDPQuery(q);
 
             // delta parameter: use 1/n^2, with n = size of the data in the query
-            double DELTA = dpQuery.getDelta();
-            String elasticStability = dpQuery.getElasticStability();
+            double DELTA = 1 / Math.pow(dpQuery.getGraphSizeTriples(), 2);
+            double beta = EPSILON / (2 * Math.log(2 / DELTA));
 
-            smoothSensitivity = dpQuery.getSmoothSensitivity();
+            String elasticStability = "0";
+            int k = 0;
+
+            if (dpQuery.isStarQuery()) {
+                elasticStability = "x";
+
+                Sensitivity sensitivity = new Sensitivity(1.0, elasticStability);
+
+                smoothSensitivity =
+                        GraphElasticSensitivity.smoothElasticSensitivityStar(
+                                elasticStability, sensitivity, beta, k);
+
+                logger.info(
+                        "Star query (smooth) sensitivity: " + smoothSensitivity.getSensitivity());
+
+            } else {
+                smoothSensitivity =
+                        GraphElasticSensitivity.smoothElasticSensitivity(
+                                dpQuery.getStarQuery().getElasticStability(),
+                                0,
+                                beta,
+                                k,
+                                dpQuery.getGraphSizeTriples());
+
+                logger.info("Path Smooth Sensitivity: " + smoothSensitivity.getSensitivity());
+            }
+            logger.info("SmoothSensitivity:" + smoothSensitivity);
 
             double scale = 2 * smoothSensitivity.getSensitivity() / EPSILON;
 
             writeAnalysisResult(
+                    q,
                     scale,
                     queryFile,
                     EPSILON,
@@ -300,6 +332,7 @@ public class RunTimeCache {
     }
 
     private static void writeAnalysisResult(
+            Query query,
             double scale,
             String queryFile,
             double EPSILON,
@@ -365,8 +398,8 @@ public class RunTimeCache {
                         elasticStability,
                         graphSize,
                         starQuery,
-                        dataSource.getMapMostFreqValue(),
-                        dataSource.getMapMostFreqValueStar());
+                        dataSource.getDPQuery(query).getMapMostFreqValues(),
+                        dataSource.getDPQuery(query).getMapMostFreqValuesStar());
 
         String resultsBuffer = result.toString().replace('\n', ' ') + "\n";
 

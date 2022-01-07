@@ -44,9 +44,9 @@ public class RunSymbolic {
 
         try {
             if (is_endpoint) {
-                dataSource = new EndpointDataSource(endpoint, EPSILON);
+                dataSource = new EndpointDataSource(endpoint);
             } else {
-                dataSource = new HDTDataSource(dataFile, EPSILON);
+                dataSource = new HDTDataSource(dataFile);
             }
 
             Path queryLocation = Paths.get(queryFile);
@@ -120,7 +120,7 @@ public class RunSymbolic {
             DPQuery dpQuery = dataSource.getDPQuery(q);
 
             // delta parameter: use 1/n^2, with n = size of the data in the query
-            double DELTA = dpQuery.getDelta();
+            double DELTA = 1 / Math.pow(dpQuery.getGraphSizeTriples(), 2);
             String elasticStability = dpQuery.getElasticStability();
 
             smoothSensitivity = dpQuery.getSmoothSensitivity();
@@ -128,6 +128,7 @@ public class RunSymbolic {
             double scale = 2 * smoothSensitivity.getSensitivity() / EPSILON;
 
             writeAnalysisResult(
+                    q,
                     scale,
                     queryFile,
                     EPSILON,
@@ -213,6 +214,7 @@ public class RunSymbolic {
     }
 
     private static void writeAnalysisResult(
+            Query query,
             double scale,
             String queryFile,
             double EPSILON,
@@ -271,8 +273,8 @@ public class RunSymbolic {
                         elasticStability,
                         graphSize,
                         starQuery,
-                        dataSource.getMapMostFreqValue(),
-                        dataSource.getMapMostFreqValueStar());
+                        dataSource.getDPQuery(query).getMapMostFreqValues(),
+                        dataSource.getDPQuery(query).getMapMostFreqValuesStar());
 
         String resultsBuffer = result.toString().replace('\n', ' ') + "\n";
 

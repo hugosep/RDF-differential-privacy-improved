@@ -18,10 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class RunTime {
@@ -29,7 +26,7 @@ public class RunTime {
     private static final Logger logger = LogManager.getLogger(RunTime.class.getName());
 
     // privacy budget
-    private static double EPSILON = 0.1;
+    private static double EPSILON = 1.0;
 
     private static String queryString;
     private static String queryFile;
@@ -51,9 +48,9 @@ public class RunTime {
 
         try {
             if (is_endpoint) {
-                dataSource = new EndpointDataSource(endpoint, EPSILON);
+                dataSource = new EndpointDataSource(endpoint);
             } else {
-                dataSource = new HDTDataSource(dataFile, EPSILON);
+                dataSource = new HDTDataSource(dataFile);
             }
 
             Path queryLocation = Paths.get(queryFile);
@@ -79,7 +76,6 @@ public class RunTime {
                     queryString = new Scanner(filePath).useDelimiter("\\Z").next();
 
                     try {
-
                         runAnalysis(
                                 filePath.toString(),
                                 queryString,
@@ -88,7 +84,8 @@ public class RunTime {
                                 evaluation,
                                 EPSILON);
                     } catch (Exception e) {
-                        logger.error(e.toString());
+                        logger.error(e.getMessage());
+                        e.printStackTrace();
                     }
                 }
 
@@ -162,14 +159,41 @@ public class RunTime {
             DPQuery dpQuery = dataSource.getDPQuery(q);
 
             // delta parameter: use 1/n^2, with n = size of the data in the query
-            double DELTA = dpQuery.getDelta();
-            String elasticStability = dpQuery.getElasticStability();
+            double DELTA = 1 / Math.pow(dpQuery.getGraphSizeTriples(), 2);
+            double beta = EPSILON / (2 * Math.log(2 / DELTA));
 
-            smoothSensitivity = dpQuery.getSmoothSensitivity();
+            String elasticStability = "0";
+            int k = 0;
+
+            if (dpQuery.isStarQuery()) {
+                elasticStability = "x";
+
+                Sensitivity sensitivity = new Sensitivity(1.0, elasticStability);
+
+                smoothSensitivity =
+                        GraphElasticSensitivity.smoothElasticSensitivityStar(
+                                elasticStability, sensitivity, beta, k);
+
+                logger.info(
+                        "Star query (smooth) sensitivity: " + smoothSensitivity.getSensitivity());
+
+            } else {
+                smoothSensitivity =
+                        GraphElasticSensitivity.smoothElasticSensitivity(
+                                dpQuery.getStarQuery().getElasticStability(),
+                                0,
+                                beta,
+                                k,
+                                dpQuery.getGraphSizeTriples());
+
+                logger.info("Path Smooth Sensitivity: " + smoothSensitivity.getSensitivity());
+            }
+            logger.info("SmoothSensitivity:" + smoothSensitivity);
 
             double scale = 2 * smoothSensitivity.getSensitivity() / EPSILON;
 
             writeAnalysisResult(
+                    q,
                     scale,
                     queryFile,
                     EPSILON,
@@ -255,6 +279,7 @@ public class RunTime {
     }
 
     private static void writeAnalysisResult(
+            Query query,
             double scale,
             String queryFile,
             double EPSILON,
@@ -320,8 +345,8 @@ public class RunTime {
                         elasticStability,
                         graphSize,
                         starQuery,
-                        dataSource.getMapMostFreqValue(),
-                        dataSource.getMapMostFreqValueStar());
+                        dataSource.getDPQuery(query).getMapMostFreqValues(),
+                        dataSource.getDPQuery(query).getMapMostFreqValuesStar());
 
         String resultsBuffer = result.toString().replace('\n', ' ') + "\n";
 

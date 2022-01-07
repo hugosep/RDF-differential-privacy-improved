@@ -1,0 +1,6 @@
+DPQueriesCacheStats: CacheStats{hitCount=406, missCount=14, loadSuccessCount=14, loadFailureCount=0, totalLoadTime=799654827797, evictionCount=0, evictionWeight=0}
+mostFrequentResultCacheStats: CacheStats{hitCount=0, missCount=23, loadSuccessCount=23, loadFailureCount=0, totalLoadTime=108185646804, evictionCount=0, evictionWeight=0}
+DPQueriesCacheStats: CacheStats{hitCount=394, missCount=18, loadSuccessCount=14, loadFailureCount=4, totalLoadTime=2127069663702, evictionCount=0, evictionWeight=0}
+mostFrequentResultCacheStats: CacheStats{hitCount=0, missCount=23, loadSuccessCount=23, loadFailureCount=0, totalLoadTime=354599510100, evictionCount=0, evictionWeight=0}
+DPQueriesCacheStats: CacheStats{hitCount=397, missCount=17, loadSuccessCount=14, loadFailureCount=3, totalLoadTime=1638522193399, evictionCount=0, evictionWeight=0}
+mostFrequentResultCacheStats: CacheStats{hitCount=0, missCount=23, loadSuccessCount=23, loadFailureCount=0, totalLoadTime=237404191895, evictionCount=0, evictionWeight=0}

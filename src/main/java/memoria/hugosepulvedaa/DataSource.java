@@ -7,10 +7,6 @@ package memoria.hugosepulvedaa;
 
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import org.apache.jena.query.Query;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.sparql.core.TriplePath;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -30,17 +26,11 @@ public interface DataSource {
 
     int mostFrequentResult(MaxFreqQuery maxFreqQuery);
 
-    void setMostFreqValueMaps(
-            Model model,
-            HashMap<MaxFreqQuery, Integer> mostFrequentResults,
-            Query originalQuery,
-            Map<String, List<TriplePath>> starQueriesMap,
-            List<List<String>> triplePatterns)
-            throws ExecutionException;
+    void setMostFreqValueMaps(DPQuery dpQuery) throws ExecutionException;
 
-    Map<String, List<StarQuery>> getMapMostFreqValueStar();
+    Map<String, List<StarQuery>> getMapMostFreqValuesStar(Query query);
 
-    Map<String, List<Integer>> getMapMostFreqValue();
+    Map<String, List<Integer>> getMapMostFreqValues(Query query);
 
     CacheStats getDPQueriesCache();
 

@@ -39,6 +39,7 @@ public class GraphElasticSensitivity {
             HashMap<MaxFreqQuery, Integer> mostFrequentResults,
             List<StarQuery> listStars) {
 
+        logger.info("h2: " + listStars.size());
         StarQuery starQueryFirst = Collections.max(listStars);
         listStars.remove(starQueryFirst);
 
@@ -114,18 +115,18 @@ public class GraphElasticSensitivity {
         StarQuery newStarQueryPrime = new StarQuery(starQueryLeft.getTriples());
         newStarQueryPrime.addStarQuery(starQueryRight.getTriples());
 
-        ExprEvaluator util = new ExprEvaluator(false, (short) 100);
+        ExprEvaluator exprEvaluator = new ExprEvaluator(false, (short) 100);
         IExpr result;
 
-        result = util.eval("Function({x}, " + polynomialf1 + ")[1]");
+        result = exprEvaluator.eval("Function({x}, " + polynomialf1 + ")[1]");
 
         // double f1Val = Math.round(f1.toBytecodeFunc().apply(1));
         // double f2Val = Math.round(f2.toBytecodeFunc().apply(1));
 
-        double f1Val = Math.round(util.evalf(result));
+        double f1Val = Math.round(exprEvaluator.evalf(result));
 
-        result = util.eval("Function({x}, " + polynomialf2 + ")[1]");
-        double f2Val = Math.round(util.evalf(result));
+        result = exprEvaluator.eval("Function({x}, " + polynomialf2 + ")[1]");
+        double f2Val = Math.round(exprEvaluator.evalf(result));
 
         if (f1Val > f2Val) {
             newStarQueryPrime.setElasticStability(polynomialf1.toString());
@@ -159,13 +160,28 @@ public class GraphElasticSensitivity {
 
         Sensitivity sensitivity = new Sensitivity(prevSensitivity, elasticSensitivity);
 
-        // this can be minor
-        short a = 100;
-        ExprEvaluator util = new ExprEvaluator(false, a);
+        // history capacity, this can be minor
+        short historyCapacity = 100;
+        ExprEvaluator exprEvaluator = new ExprEvaluator(false, historyCapacity);
 
         // NSolve function uses Laguerre's method, returning real and complex solutions
-        IExpr result = util.eval("diff(E^(-" + beta + "*x)*" + elasticSensitivity + ",x)");
-        result = util.eval("NSolve(0==" + result.toString() + ",x)");
+        logger.info("E^(-" + beta + "*x)*" + elasticSensitivity);
+
+        IExpr result = exprEvaluator.eval("diff(E^(-" + beta + "*x)*" + elasticSensitivity + ",x)");
+        String derivate = result.toString();
+
+        String cleaned = derivate.replaceAll("2.718281828459045", "E");
+        cleaned = cleaned.replaceAll("\\*E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "");
+        cleaned = cleaned.replaceAll("E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)\\*", "");
+        cleaned = cleaned.replaceAll("/E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "");
+        cleaned = cleaned.replaceAll("\\+E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "+1");
+        cleaned = cleaned.replaceAll("E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)\\+", "1+");
+
+        logger.info("Cleaned function: " + cleaned);
+
+        //result = exprEvaluator.eval("NSolve(0==" + cleaned + ",x)");
+        result = exprEvaluator.eval("NRoots(" + cleaned + "==0)");
+
         String strResult = result.toString();
 
         double ceilMaxCandidate = k;
@@ -174,7 +190,7 @@ public class GraphElasticSensitivity {
         if (strResult.equals("{}")) {
             logger.info("The function has no roots.");
         } else {
-
+            logger.info("Candidates: "+ result);
             /* OPTIMIZATION
              * If we maximize E^(-beta*x)*P(x), where P(x) is a polynomial.
              * The maximal value can be determined finding the max maximal
@@ -187,15 +203,16 @@ public class GraphElasticSensitivity {
             List<String> listStrZeros = new ArrayList<>(Arrays.asList(arrayZeros));
 
             // clean the string returned
-            listStrZeros.replaceAll(zero -> zero.substring(1, zero.length() - 1));
-            listStrZeros.replaceAll(zero -> zero.substring(3));
+            /*listStrZeros.replaceAll(zero -> zero.substring(1, zero.length() - 1));
+            listStrZeros.replaceAll(zero -> zero.substring(3));*/
 
             // remove complex solutions
             listStrZeros.removeIf(zero -> zero.contains("I"));
             listStrZeros.removeIf(zero -> zero.contains("i"));
+            logger.info("aaa: " + listStrZeros);
 
             List<Double> listDoubleZeros =
-                    listStrZeros.stream().map(util::evalf).collect(Collectors.toList());
+                    listStrZeros.stream().map(exprEvaluator::evalf).collect(Collectors.toList());
 
             double maxCandidate = Collections.max(listDoubleZeros);
 
@@ -206,13 +223,16 @@ public class GraphElasticSensitivity {
 
             if (ceilMaxCandidate < 0) {
                 ceilMaxCandidate = k;
+
+            } else if(ceilMaxCandidate > graphSize) {
+                ceilMaxCandidate = graphSize;
             }
         }
 
         for (int i = k; i <= ceilMaxCandidate; i++) {
-            result = util.eval("Function({x}, " + elasticSensitivity + ")[" + i + "]");
+            result = exprEvaluator.eval("Function({x}, " + elasticSensitivity + ")[" + i + "]");
 
-            double kPrime = util.evalf(result);
+            double kPrime = exprEvaluator.evalf(result);
             double smoothSensitivity = Math.exp(-i * beta) * kPrime;
 
             if (smoothSensitivity > prevSensitivity) {
@@ -228,10 +248,7 @@ public class GraphElasticSensitivity {
     }
 
     public static Sensitivity smoothElasticSensitivityStar(
-            String elasticSensitivity,
-            Sensitivity prevSensitivity,
-            double beta,
-            int k) {
+            String elasticSensitivity, Sensitivity prevSensitivity, double beta, int k) {
 
         /* OPTIMIZATION
          * It doesn't make sense iterate for f(x)=E^(-beta*x), because the function is a decreasing
@@ -240,12 +257,11 @@ public class GraphElasticSensitivity {
          * parameter k.
          */
 
-        double exponentialPart = Math.exp(-k * beta);
+        double exponentialPart = Math.exp(-beta * k);
         Sensitivity smoothSensitivity = new Sensitivity(exponentialPart, elasticSensitivity);
         smoothSensitivity.setMaxK(k);
 
-        if (smoothSensitivity.getSensitivity() > prevSensitivity.getSensitivity())
-        {
+        if (smoothSensitivity.getSensitivity() > prevSensitivity.getSensitivity()) {
             return smoothSensitivity;
         }
 
