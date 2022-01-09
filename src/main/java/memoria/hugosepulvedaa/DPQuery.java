@@ -8,10 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 public class DPQuery {
-    private Model model;
     private Long graphSizeTriples;
     private boolean isStarQuery;
-    private double EPSILON;
     private String elasticStability;
     private Sensitivity smoothSensitivity;
     private HashMap<MaxFreqQuery, Integer> mostFrequentResults;
@@ -110,20 +108,12 @@ public class DPQuery {
         return isStarQuery;
     }
 
-    public Model getModel() {
-        return this.model;
-    }
-
     public Long getGraphSizeTriples() {
         return this.graphSizeTriples;
     }
 
     public String getElasticStability() {
         return this.elasticStability;
-    }
-
-    public void setModel(Model model) {
-        this.model = model;
     }
 
     public void setGraphSizeTriples(Long graphSizeTriples) {

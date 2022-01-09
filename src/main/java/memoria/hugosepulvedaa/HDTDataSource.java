@@ -10,7 +10,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.sparql.core.TriplePath;
-import org.apache.jena.sparql.syntax.Element;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.rdfhdt.hdt.hdt.HDT;
@@ -58,8 +57,6 @@ public class HDTDataSource implements DataSource {
 
                                     DPQuery dpQuery = new DPQuery();
 
-                                    dpQuery.setModel(executeConstructQuery(key));
-
                                     dpQuery.setStarQueriesMap(Helper.getStarPatterns(key));
 
                                     List<List<String>> triplePatterns = new ArrayList<>();
@@ -76,9 +73,7 @@ public class HDTDataSource implements DataSource {
                                     setMostFreqValueMaps(dpQuery);
 
                                     long graphSize =
-                                            calculateGraphSizeTriples(
-                                                    dpQuery.getModel(),
-                                                    dpQuery.getTriplePatterns());
+                                            calculateGraphSizeTriples(dpQuery.getTriplePatterns());
 
                                     dpQuery.setGraphSizeTriples(graphSize);
 
@@ -131,25 +126,7 @@ public class HDTDataSource implements DataSource {
 
     @Override
     public long getGraphSize(Query query) {
-        return (DPQueriesCache.get(query).getModel().size());
-    }
-
-    public Model executeConstructQuery(Query query) {
-        Element queryPattern = query.getQueryPattern();
-
-        String cleanConstructQuery =
-                queryPattern.toString().replaceAll(".\n *(FILTER *(.*) *)", ".");
-        cleanConstructQuery = cleanConstructQuery.replaceAll("(FILTER *(.*) *)", "");
-
-        String constructQuery = "CONSTRUCT " + cleanConstructQuery + " WHERE " + queryPattern;
-
-        logger.info("constructQuery: " + constructQuery);
-
-        try (QueryExecution qexec = QueryExecutionFactory.create(query, triples)) {
-            Model model = qexec.execConstruct();
-            qexec.close();
-            return model;
-        }
+        return (DPQueriesCache.get(query).getGraphSizeTriples());
     }
 
     @Override
@@ -176,31 +153,6 @@ public class HDTDataSource implements DataSource {
         return countResult;
     }
 
-    public int executeCountQueryInternal(Model model, String queryString) {
-        Query query = QueryFactory.create(queryString);
-
-        // no entiendo por que esta esto
-        if (queryString.contains("http://www.wikidata.org/prop/direct/P31")
-                && (queryString.lastIndexOf('?') != queryString.indexOf('?'))) {
-            return 85869721;
-        }
-
-        QueryExecution qexec = QueryExecutionFactory.create(query, model);
-
-        ResultSet results = qexec.execSelect();
-        QuerySolution soln = results.nextSolution();
-
-        logger.info("Count query executed... ");
-
-        qexec.close();
-
-        RDFNode x = soln.get(soln.varNames().next());
-        int countResult = x.asLiteral().getInt();
-
-        logger.info("Count query result (endpoint): " + countResult);
-        return countResult;
-    }
-
     /*
        @description Sum all COUNTs of every generated query.
     */
@@ -209,7 +161,7 @@ public class HDTDataSource implements DataSource {
         return (DPQueriesCache.get(query).getGraphSizeTriples());
     }
 
-    public Long calculateGraphSizeTriples(Model model, List<List<String>> triplePatternsCount) {
+    public Long calculateGraphSizeTriples(List<List<String>> triplePatternsCount) {
 
         long count = 0L;
 
@@ -224,8 +176,7 @@ public class HDTDataSource implements DataSource {
 
             logger.info("Construct query for graph size so far: " + construct);
             count +=
-                    executeCountQueryInternal(
-                            model, "SELECT (COUNT(*) as ?count) WHERE { " + construct + "} ");
+                    executeCountQuery("SELECT (COUNT(*) as ?count) WHERE { " + construct + "} ", true);
             logger.info("Graph size so far: " + count);
         }
         logger.info("count: " + count);
