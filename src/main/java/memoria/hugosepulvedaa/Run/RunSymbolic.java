@@ -1,7 +1,6 @@
 package memoria.hugosepulvedaa.Run;
 
 import memoria.hugosepulvedaa.*;
-import memoria.hugosepulvedaa.DPQuery;
 import org.apache.commons.cli.*;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
@@ -20,6 +19,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class RunSymbolic {
 
@@ -35,6 +35,10 @@ public class RunSymbolic {
     private static String endpoint;
     private static boolean evaluation = false;
     private static boolean is_endpoint = false;
+
+    private static long startTime;
+    private static long endTime;
+    private static final HashMap<String, List<Long>> mapTimes = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
 
@@ -54,37 +58,71 @@ public class RunSymbolic {
             if (Files.isRegularFile(queryLocation)) {
 
                 queryString = new Scanner(new File(queryFile)).useDelimiter("\\Z").next();
+                mapTimes.put(queryFile, new ArrayList<>());
                 runAnalysis(queryFile, queryString, dataSource, outputFile, evaluation, EPSILON);
 
             } else if (Files.isDirectory(queryLocation)) {
 
-                Iterator<Path> filesPath =
+                List<Path> filesPath =
                         Files.list(Paths.get(queryFile))
                                 .filter(p -> p.toString().endsWith(".rq"))
-                                .iterator();
+                                .collect(Collectors.toList());
 
                 logger.info("Running analysis to DIRECTORY: " + queryLocation);
 
-                while (filesPath.hasNext()) {
+                for (Path filePath : filesPath) {
+                    mapTimes.put(filePath.toString(), new ArrayList<>());
+                    logger.info("Running analysis to query: " + filePath);
 
-                    Path nextQuery = filesPath.next();
-
-                    logger.info("Running analysis to query: " + nextQuery.toString());
-
-                    queryString = new Scanner(nextQuery).useDelimiter("\\Z").next();
+                    queryString = new Scanner(filePath).useDelimiter("\\Z").next();
 
                     try {
                         runAnalysis(
-                                nextQuery.toString(),
+                                filePath.toString(),
                                 queryString,
                                 dataSource,
                                 outputFile,
                                 evaluation,
                                 EPSILON);
                     } catch (Exception e) {
-                        logger.error("query failed!!: " + nextQuery);
+                        logger.error(e.getMessage());
+                        e.printStackTrace();
                     }
                 }
+
+                try {
+                    File fileTime = new File("fileTime.txt");
+
+                    if (fileTime.createNewFile()) {
+                        System.out.println("File created: " + fileTime.getName());
+                    } else {
+                        System.out.println("File already exists.");
+                    }
+
+                    logger.info("length mapTimes: " + mapTimes.size());
+
+                    for (String key : mapTimes.keySet()) {
+                        List<Long> durations = mapTimes.get(key);
+                        String strKey = key + " " + durations.size() + "\n";
+
+                        Files.write(
+                                Paths.get("fileTime.txt"),
+                                strKey.getBytes(),
+                                StandardOpenOption.APPEND);
+
+                        for (Long d : durations) {
+                            String strD = d + "\n";
+                            Files.write(
+                                    Paths.get("fileTime.txt"),
+                                    strD.getBytes(),
+                                    StandardOpenOption.APPEND);
+                        }
+                    }
+                } catch (IOException e) {
+                    System.out.println("An error occurred.");
+                    e.printStackTrace();
+                }
+
             } else {
                 if (Files.notExists(queryLocation)) {
                     throw new FileNotFoundException("No query directory or file");
@@ -108,6 +146,8 @@ public class RunSymbolic {
         // execute COUNT query
         int countQueryResult = dataSource.executeCountQuery(queryString, true);
 
+        startTime = System.nanoTime();
+
         Query q = QueryFactory.create(queryString);
         ElementGroup queryPattern = (ElementGroup) q.getQueryPattern();
         List<Element> elementList = queryPattern.getElements();
@@ -121,9 +161,35 @@ public class RunSymbolic {
 
             // delta parameter: use 1/n^2, with n = size of the data in the query
             double DELTA = 1 / Math.pow(dpQuery.getGraphSizeTriples(), 2);
-            String elasticStability = dpQuery.getElasticStability();
+            double beta = EPSILON / (2 * Math.log(2 / DELTA));
 
-            smoothSensitivity = dpQuery.getSmoothSensitivity();
+            String elasticStability = "0";
+            int k = 0;
+
+            if (dpQuery.isStarQuery()) {
+                elasticStability = "x";
+
+                Sensitivity sensitivity = new Sensitivity(1.0, elasticStability);
+
+                smoothSensitivity =
+                        GraphElasticSensitivity.smoothElasticSensitivityStar(
+                                elasticStability, sensitivity, beta, k);
+
+                logger.info(
+                        "Star query (smooth) sensitivity: " + smoothSensitivity.getSensitivity());
+
+            } else {
+                smoothSensitivity =
+                        GraphElasticSensitivity.smoothElasticSensitivity(
+                                dpQuery.getStarQuery().getElasticStability(),
+                                0,
+                                beta,
+                                k,
+                                dpQuery.getGraphSizeTriples());
+
+                logger.info("Path Smooth Sensitivity: " + smoothSensitivity.getSensitivity());
+            }
+            logger.info("SmoothSensitivity:" + smoothSensitivity);
 
             double scale = 2 * smoothSensitivity.getSensitivity() / EPSILON;
 
@@ -259,6 +325,13 @@ public class RunSymbolic {
             privateResultList.add(finalResult1);
             resultList.add(countQueryResult);
         }
+
+        // stopTime
+        endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        logger.info("Time: " + duration + " nanoseconds");
+
+        mapTimes.get(queryFile).add(duration);
 
         Result result =
                 new Result(

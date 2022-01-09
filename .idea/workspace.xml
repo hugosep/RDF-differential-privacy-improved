@@ -5,21 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2c4b3c1a-d253-4ec3-a949-86e1468970ea" name="Changes" comment="Fixed: can change epsilon.">
-      <change afterPath="$PROJECT_DIR$/fileCacheStats.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fileTime.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/apache_logging_log4j_core.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/apache_logging_log4j_core.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_01-01-2022_20_29_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_01-01-2022_20_29__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DPQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DPQuery.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RDF-differential-privacy-improved.iml" beforeDir="false" afterPath="$PROJECT_DIR$/RDF-differential-privacy-improved.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/HDTDataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/HDTDataSource.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/MaxFreqQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/MaxFreqQuery.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/Result.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/Result.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunQuery.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunSymbolic.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunSymbolic.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTime.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTime.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTimeCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTimeCache.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTime.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,6 +27,9 @@
         <option value="Class" />
       </list>
     </option>
+  </component>
+  <component name="Git.Merge.Settings">
+    <option name="BRANCH" value="origin/changing_epsilon" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -48,12 +46,6 @@
       <filtered-out-file-type name="TAG" />
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
-  </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/Run/RunTime.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/DataSource.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -104,7 +96,7 @@
       <recent name="memoria.hugosepulvedaa" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.RunTimeCache">
+  <component name="RunManager" selected="Application.RunSymbolic">
     <configuration name="RunSymbolic" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="memoria.hugosepulvedaa.Run.RunSymbolic" />
       <module name="RDF-differential-privacy-improved" />
@@ -114,19 +106,10 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="RunTime" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="memoria.hugosepulvedaa.Run.RunTime" />
-      <module name="RDF-differential-privacy-improved" />
-      <option name="PROGRAM_PARAMETERS" value="-endpoint https://query.wikidata.org/sparql -e resources/wikidata_queries/working/ -o output " />
-      <option name="VM_PARAMETERS" value="-Dlog4j2.info=true" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="RunTimeCache" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="memoria.hugosepulvedaa.Run.RunTimeCache" />
       <module name="RDF-differential-privacy-improved" />
-      <option name="PROGRAM_PARAMETERS" value="-endpoint https://query.wikidata.org/sparql -e resources/wikidata_queries/working -o output " />
+      <option name="PROGRAM_PARAMETERS" value="-endpoint https://query.wikidata.org/sparql -e resources/wikidata_queries/working/ -o output " />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -141,9 +124,8 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Application.RunSymbolic" />
       <item itemvalue="Application.RunTimeCache" />
-      <item itemvalue="Application.RunTime" />
+      <item itemvalue="Application.RunSymbolic" />
       <item itemvalue="JUnit.MaxFreqQueryTest" />
     </list>
     <recent_temporary>

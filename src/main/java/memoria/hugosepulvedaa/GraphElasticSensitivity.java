@@ -164,23 +164,29 @@ public class GraphElasticSensitivity {
         short historyCapacity = 100;
         ExprEvaluator exprEvaluator = new ExprEvaluator(false, historyCapacity);
 
-        // NSolve function uses Laguerre's method, returning real and complex solutions
-        logger.info("E^(-" + beta + "*x)*" + elasticSensitivity);
+        logger.info("Function: E^(-" + beta + "*x)*" + elasticSensitivity);
 
+        // derivative of the function
         IExpr result = exprEvaluator.eval("diff(E^(-" + beta + "*x)*" + elasticSensitivity + ",x)");
-        String derivate = result.toString();
+        String derivative = result.toString();
 
-        String cleaned = derivate.replaceAll("2.718281828459045", "E");
-        cleaned = cleaned.replaceAll("\\*E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "");
-        cleaned = cleaned.replaceAll("E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)\\*", "");
-        cleaned = cleaned.replaceAll("/E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "");
-        cleaned = cleaned.replaceAll("\\+E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "+1");
-        cleaned = cleaned.replaceAll("E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)\\+", "1+");
+        // replace the value of E in the derivative string
+        derivative = derivative.replaceAll("2.718281828459045", "E");
+        logger.info("Derivative function: " + derivative);
 
-        logger.info("Cleaned function: " + cleaned);
+        // simplification of the function, deleting the exponential part and only getting the polynomial
+        String simplified = derivative.replaceAll("\\*E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "");
+        simplified = simplified.replaceAll("E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)\\*", "");
+        simplified = simplified.replaceAll("/E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "");
+        simplified = simplified.replaceAll("\\+E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "+1");
+        simplified = simplified.replaceAll("E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)\\+", "1+");
+        simplified = simplified.replaceAll("-E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "-1");
+        simplified = simplified.replaceAll("E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)-", "1-");
 
-        //result = exprEvaluator.eval("NSolve(0==" + cleaned + ",x)");
-        result = exprEvaluator.eval("NRoots(" + cleaned + "==0)");
+        logger.info("Simplified function: " + simplified);
+
+        // NRoots function uses Laguerre's method, returning real and complex solutions
+        result = exprEvaluator.eval("NRoots(" + simplified + "==0)");
 
         String strResult = result.toString();
 
@@ -209,7 +215,6 @@ public class GraphElasticSensitivity {
             // remove complex solutions
             listStrZeros.removeIf(zero -> zero.contains("I"));
             listStrZeros.removeIf(zero -> zero.contains("i"));
-            logger.info("aaa: " + listStrZeros);
 
             List<Double> listDoubleZeros =
                     listStrZeros.stream().map(exprEvaluator::evalf).collect(Collectors.toList());
@@ -256,6 +261,7 @@ public class GraphElasticSensitivity {
          * For this reason, the max value will be E^(-beta*x) with the initial x, in this case the
          * parameter k.
          */
+        logger.info("Function: E^(-" + beta + "*k)");
 
         double exponentialPart = Math.exp(-beta * k);
         Sensitivity smoothSensitivity = new Sensitivity(exponentialPart, elasticSensitivity);
