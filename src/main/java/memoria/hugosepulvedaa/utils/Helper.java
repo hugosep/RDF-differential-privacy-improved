@@ -261,4 +261,19 @@ public class Helper {
         }
         return (newStrQuery);
     }
+
+    public static String simplifyToPolynomial(String derivative) {
+
+        derivative = derivative.replaceAll("2.718281828459045", "E");
+
+        String simplified = derivative.replaceAll("\\*E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "");
+        simplified = simplified.replaceAll("E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)\\*", "");
+        simplified = simplified.replaceAll("/E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "");
+        simplified = simplified.replaceAll("\\+E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "+1");
+        simplified = simplified.replaceAll("E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)\\+", "1+");
+        simplified = simplified.replaceAll("-E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "-1");
+        simplified = simplified.replaceAll("E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)-", "1-");
+
+        return simplified;
+    }
 }

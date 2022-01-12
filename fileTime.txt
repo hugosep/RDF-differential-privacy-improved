@@ -1,0 +1,28 @@
+resources\wikidata_queries\working\F2.rq 1
+122968464400
+resources\wikidata_queries\working\F1.rq 1
+75490857000
+resources\wikidata_queries\working\F3.rq 1
+83944145600
+resources\wikidata_queries\working\F4.rq 1
+79935071300
+resources\wikidata_queries\working\S2.rq 1
+5870247300
+resources\wikidata_queries\working\S3.rq 1
+24390808400
+resources\wikidata_queries\working\S4.rq 1
+32278003000
+resources\wikidata_queries\working\S1.rq 1
+1544868200
+resources\wikidata_queries\working\F6.rq 1
+75944244700
+resources\wikidata_queries\working\F5.rq 1
+106908773300
+resources\wikidata_queries\working\L2.rq 1
+13268565700
+resources\wikidata_queries\working\L1.rq 1
+84165334600
+resources\wikidata_queries\working\L3.rq 1
+36894129200
+resources\wikidata_queries\working\L4.rq 1
+125620488500

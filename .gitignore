@@ -77,3 +77,5 @@ fabric.properties
 
 target/
 output
+fileTime.txt
+fileCacheStats.txt

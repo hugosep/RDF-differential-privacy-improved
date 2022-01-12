@@ -5,8 +5,7 @@ PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wd: <http://www.wikidata.org/entity/>
 PREFIX schema: <http://schema.org/>
 SELECT (COUNT(?item) as ?c)
-WHERE
-{
+WHERE {
   ?item wdt:P352 ?uniprotid ;
           wdt:P703 wd:Q15978631 .
 }

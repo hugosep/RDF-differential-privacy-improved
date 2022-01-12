@@ -1,5 +1,6 @@
 package memoria.hugosepulvedaa;
 
+import memoria.hugosepulvedaa.utils.Helper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matheclipse.core.eval.ExprEvaluator;
@@ -176,13 +177,7 @@ public class GraphElasticSensitivity {
 
         // simplification of the function, deleting the exponential part and only getting the
         // polynomial
-        String simplified = derivative.replaceAll("\\*E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "");
-        simplified = simplified.replaceAll("E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)\\*", "");
-        simplified = simplified.replaceAll("/E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "");
-        simplified = simplified.replaceAll("\\+E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "+1");
-        simplified = simplified.replaceAll("E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)\\+", "1+");
-        simplified = simplified.replaceAll("-E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "-1");
-        simplified = simplified.replaceAll("E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)-", "1-");
+        String simplified = Helper.simplifyToPolynomial(derivative);
 
         logger.info("Simplified function: " + simplified);
 
@@ -198,6 +193,7 @@ public class GraphElasticSensitivity {
             logger.info("The function has no roots.");
         } else {
             logger.info("Candidates: " + result);
+
             /* OPTIMIZATION
              * If we maximize E^(-beta*x)*P(x), where P(x) is a polynomial.
              * The maximal value can be determined finding the max maximal

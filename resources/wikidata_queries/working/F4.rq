@@ -1,5 +1,5 @@
-
-SELECT  ( COUNT (  ?var2  ) AS  ?var3  ) WHERE {
+SELECT  ( COUNT (  ?var2  ) AS  ?var3  )
+WHERE {
   ?var2  <http://www.wikidata.org/prop/direct/P31> ?tmp .
   ?tmp <http://www.wikidata.org/prop/direct/P279> <http://www.wikidata.org/entity/Q21480300> .
   ?var2   <http://www.wikidata.org/prop/direct/P585>  ?var4 .
