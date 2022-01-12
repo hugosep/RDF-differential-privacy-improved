@@ -55,10 +55,11 @@ public class Result {
 
     @Override
     public String toString() {
-        Gson gson = new GsonBuilder()
-                .serializeSpecialFloatingPointValues()
-                .setPrettyPrinting()
-                .create();
+        Gson gson =
+                new GsonBuilder()
+                        .serializeSpecialFloatingPointValues()
+                        .setPrettyPrinting()
+                        .create();
 
         return gson.toJson(this);
     }

@@ -1,6 +1,5 @@
 package memoria.hugosepulvedaa;
 
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.core.TriplePath;
 
 import java.util.HashMap;
@@ -8,12 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 public class DPQuery {
-    private Model model;
     private Long graphSizeTriples;
     private boolean isStarQuery;
-    private double EPSILON;
-    private String elasticStability;
-    private Sensitivity smoothSensitivity;
     private HashMap<MaxFreqQuery, Integer> mostFrequentResults;
     private HashMap<String, List<Integer>> mapMostFreqValues;
     private HashMap<String, List<StarQuery>> mapMostFreqValuesStar;
@@ -27,28 +22,12 @@ public class DPQuery {
         this.mapMostFreqValuesStar = new HashMap<>();
     }
 
-    public void setStarQuery(boolean starQuery) {
-        isStarQuery = starQuery;
-    }
-
-    public void setMostFrequentResults(HashMap<MaxFreqQuery, Integer> mostFrequentResults) {
-        this.mostFrequentResults = mostFrequentResults;
-    }
-
     public Map<String, List<Integer>> getMapMostFreqValues() {
         return mapMostFreqValues;
     }
 
-    public void setMapMostFreqValues(HashMap<String, List<Integer>> mapMostFreqValues) {
-        this.mapMostFreqValues = mapMostFreqValues;
-    }
-
     public Map<String, List<StarQuery>> getMapMostFreqValuesStar() {
         return mapMostFreqValuesStar;
-    }
-
-    public void setMapMostFreqValuesStar(HashMap<String, List<StarQuery>> mapMostFreqValuesStar) {
-        this.mapMostFreqValuesStar = mapMostFreqValuesStar;
     }
 
     public Map<String, List<TriplePath>> getStarQueriesMap() {
@@ -98,32 +77,12 @@ public class DPQuery {
         return mostFrequentResults;
     }
 
-    public Integer getMostFrequentResult(MaxFreqQuery maxFreqQuery) {
-        return mostFrequentResults.get(maxFreqQuery);
-    }
-
-    public Sensitivity getSmoothSensitivity() {
-        return smoothSensitivity;
-    }
-
     public boolean isStarQuery() {
         return isStarQuery;
     }
 
-    public Model getModel() {
-        return this.model;
-    }
-
     public Long getGraphSizeTriples() {
         return this.graphSizeTriples;
-    }
-
-    public String getElasticStability() {
-        return this.elasticStability;
-    }
-
-    public void setModel(Model model) {
-        this.model = model;
     }
 
     public void setGraphSizeTriples(Long graphSizeTriples) {
@@ -132,13 +91,5 @@ public class DPQuery {
 
     public void setIsStarQuery(boolean isStarQuery) {
         this.isStarQuery = isStarQuery;
-    }
-
-    public void setSmoothSensitivity(Sensitivity smoothSensitivity) {
-        this.smoothSensitivity = smoothSensitivity;
-    }
-
-    public void setElasticStability(String elasticStability) {
-        this.elasticStability = elasticStability;
     }
 }

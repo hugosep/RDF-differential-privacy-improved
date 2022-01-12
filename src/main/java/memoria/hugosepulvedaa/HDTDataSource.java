@@ -58,43 +58,46 @@ public class HDTDataSource implements DataSource {
 
                                     DPQuery dpQuery = new DPQuery();
 
-                                    dpQuery.setModel(executeConstructQuery(key));
+                                    dpQuery.setGraphSizeTriples(executeConstructQuery(key).size());
 
                                     dpQuery.setStarQueriesMap(Helper.getStarPatterns(key));
 
                                     List<List<String>> triplePatterns = new ArrayList<>();
                                     dpQuery.setTriplePatterns(triplePatterns);
-                                    List<StarQuery> listStars = new ArrayList<>();
-
-                                    for (List<TriplePath> tp :
-                                            dpQuery.getStarQueriesMap().values()) {
-                                        listStars.add(new StarQuery(tp));
-                                    }
-
-                                    dpQuery.setListStars(listStars);
 
                                     setMostFreqValueMaps(dpQuery);
 
-                                    long graphSize =
-                                            calculateGraphSizeTriples(
-                                                    dpQuery.getModel(),
-                                                    dpQuery.getTriplePatterns());
-
-                                    dpQuery.setGraphSizeTriples(graphSize);
+                                    /*long graphSize =
+                                    calculateGraphSizeTriples(
+                                            dpQuery.getModel(),
+                                            dpQuery.getTriplePatterns());*/
 
                                     dpQuery.setIsStarQuery(Helper.isStarQuery(key));
 
-                                    StarQuery starQuery =
-                                            GraphElasticSensitivity.calculateSensitivity(
-                                                    HDTDataSource.this,
-                                                    dpQuery.getMostFrequentResults(),
-                                                    new ArrayList<>(dpQuery.getListStars()));
+                                    logger.info("listStars:" + dpQuery.getListStars());
 
-                                    dpQuery.setStarQuery(starQuery);
+                                    if (!dpQuery.isStarQuery()) {
+                                        List<StarQuery> listStars = new ArrayList<>();
 
-                                    logger.info(
-                                            "Elastic Stability: "
-                                                    + starQuery.getElasticStability());
+                                        for (List<TriplePath> tp :
+                                                dpQuery.getStarQueriesMap().values()) {
+                                            listStars.add(new StarQuery(tp));
+                                        }
+
+                                        dpQuery.setListStars(listStars);
+
+                                        StarQuery starQuery =
+                                                GraphElasticSensitivity.calculateSensitivity(
+                                                        HDTDataSource.this,
+                                                        dpQuery.getMostFrequentResults(),
+                                                        new ArrayList<>(dpQuery.getListStars()));
+
+                                        dpQuery.setStarQuery(starQuery);
+
+                                        logger.info(
+                                                "Elastic Stability: "
+                                                        + starQuery.getElasticStability());
+                                    }
 
                                     // stopTime
                                     long endTime = System.nanoTime();
@@ -127,11 +130,6 @@ public class HDTDataSource implements DataSource {
 
     public DPQuery getDPQuery(Query key) {
         return DPQueriesCache.get(key);
-    }
-
-    @Override
-    public long getGraphSize(Query query) {
-        return (DPQueriesCache.get(query).getModel().size());
     }
 
     public Model executeConstructQuery(Query query) {
@@ -174,62 +172,6 @@ public class HDTDataSource implements DataSource {
         qexec.close();
         logger.info("Count query result (endpoint): " + countResult);
         return countResult;
-    }
-
-    public int executeCountQueryInternal(Model model, String queryString) {
-        Query query = QueryFactory.create(queryString);
-
-        // no entiendo por que esta esto
-        if (queryString.contains("http://www.wikidata.org/prop/direct/P31")
-                && (queryString.lastIndexOf('?') != queryString.indexOf('?'))) {
-            return 85869721;
-        }
-
-        QueryExecution qexec = QueryExecutionFactory.create(query, model);
-
-        ResultSet results = qexec.execSelect();
-        QuerySolution soln = results.nextSolution();
-
-        logger.info("Count query executed... ");
-
-        qexec.close();
-
-        RDFNode x = soln.get(soln.varNames().next());
-        int countResult = x.asLiteral().getInt();
-
-        logger.info("Count query result (endpoint): " + countResult);
-        return countResult;
-    }
-
-    /*
-       @description Sum all COUNTs of every generated query.
-    */
-    @Override
-    public Long getGraphSizeTriples(Query query) {
-        return (DPQueriesCache.get(query).getGraphSizeTriples());
-    }
-
-    public Long calculateGraphSizeTriples(Model model, List<List<String>> triplePatternsCount) {
-
-        long count = 0L;
-
-        // triplePatternsCount has all triples generated by setMostFreqValueMaps method
-        for (List<String> star : triplePatternsCount) {
-
-            StringBuilder construct = new StringBuilder();
-
-            for (String tp : star) {
-                construct.append(tp).append(" . ");
-            }
-
-            logger.info("Construct query for graph size so far: " + construct);
-            count +=
-                    executeCountQueryInternal(
-                            model, "SELECT (COUNT(*) as ?count) WHERE { " + construct + "} ");
-            logger.info("Graph size so far: " + count);
-        }
-        logger.info("count: " + count);
-        return count;
     }
 
     @Override

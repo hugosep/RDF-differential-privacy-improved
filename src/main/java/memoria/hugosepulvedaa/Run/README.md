@@ -44,7 +44,8 @@ $ -eps {epsilon}
 
 ### RunTimeCache
 
-Run a cache plan, reading lines of the _planCache.txt_. Used to the test _working_ queries and the eviction policy of cache:
+Run a cache plan, reading lines of the _planCache.txt_. Used to the test _working_ queries and the eviction policy of
+cache:
 
 ```
 $ -q {input SPARQL query}

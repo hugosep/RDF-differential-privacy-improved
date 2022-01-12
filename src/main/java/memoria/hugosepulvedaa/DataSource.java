@@ -16,11 +16,7 @@ public interface DataSource {
 
     DPQuery getDPQuery(Query query);
 
-    long getGraphSize(Query query);
-
     int executeCountQuery(String queryString, boolean principal);
-
-    Long getGraphSizeTriples(Query query);
 
     int getMostFrequentResult(String starQuery, String variableName);
 

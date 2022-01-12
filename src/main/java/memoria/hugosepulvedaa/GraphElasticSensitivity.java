@@ -174,7 +174,8 @@ public class GraphElasticSensitivity {
         derivative = derivative.replaceAll("2.718281828459045", "E");
         logger.info("Derivative function: " + derivative);
 
-        // simplification of the function, deleting the exponential part and only getting the polynomial
+        // simplification of the function, deleting the exponential part and only getting the
+        // polynomial
         String simplified = derivative.replaceAll("\\*E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "");
         simplified = simplified.replaceAll("E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)\\*", "");
         simplified = simplified.replaceAll("/E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "");
@@ -196,7 +197,7 @@ public class GraphElasticSensitivity {
         if (strResult.equals("{}")) {
             logger.info("The function has no roots.");
         } else {
-            logger.info("Candidates: "+ result);
+            logger.info("Candidates: " + result);
             /* OPTIMIZATION
              * If we maximize E^(-beta*x)*P(x), where P(x) is a polynomial.
              * The maximal value can be determined finding the max maximal
@@ -229,7 +230,7 @@ public class GraphElasticSensitivity {
             if (ceilMaxCandidate < 0) {
                 ceilMaxCandidate = k;
 
-            } else if(ceilMaxCandidate > graphSize) {
+            } else if (ceilMaxCandidate > graphSize) {
                 ceilMaxCandidate = graphSize;
             }
         }
