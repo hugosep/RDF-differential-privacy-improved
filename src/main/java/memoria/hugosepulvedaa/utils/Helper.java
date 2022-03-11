@@ -263,7 +263,7 @@ public class Helper {
     }
 
     public static String simplifyToPolynomial(String derivative) {
-
+        // replace the value of E in the derivative string
         derivative = derivative.replaceAll("2.718281828459045", "E");
 
         String simplified = derivative.replaceAll("\\*E\\^\\([+-]?\\d*\\.?\\d*\\*x\\)", "");

@@ -4,26 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2c4b3c1a-d253-4ec3-a949-86e1468970ea" name="Changes" comment="Minor changes: unnecessary comments deleted.">
-      <change afterPath="$PROJECT_DIR$/fileTime.txt" afterDir="false" />
+    <list default="true" id="2c4b3c1a-d253-4ec3-a949-86e1468970ea" name="Changes" comment="Minor changes: Regex to simplify polynomial expression.">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apiguardian_apiguardian_api_1_1_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_5_8_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_api_5_8_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_engine_5_8_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_params_5_8_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_platform_junit_platform_commons_1_8_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_platform_junit_platform_engine_1_8_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_opentest4j_opentest4j_1_2_0.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_07-01-2022_11_45_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_07-01-2022_11_45__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/F1.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/F1.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/F2.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/F2.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/F3.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/F3.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/F4.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/F4.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/F5.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/F5.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/F6.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/F6.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/L1.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/L1.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/L2.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/L2.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/L3.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/L3.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/L4.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/L4.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/S1.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/S1.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/S2.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/S2.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/S3.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/S3.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/wikidata_queries/working/S4.rq" beforeDir="false" afterPath="$PROJECT_DIR$/resources/wikidata_queries/working/S4.rq" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/GraphElasticSensitivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RDF-differential-privacy-improved.iml" beforeDir="false" afterPath="$PROJECT_DIR$/RDF-differential-privacy-improved.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fileTime.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/EndpointDataSource.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/utils/Helper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/memoria/hugosepulvedaa/utils/Helper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/MaxFreqQueryTest.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,6 +34,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Class" />
+        <option value="JUnit5 Test Class" />
       </list>
     </option>
   </component>
@@ -78,8 +79,10 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="TODO_SCOPE" value="All Places" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Downloads/execution-sounds-1.5.jar" />
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Downloads/demo" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.40574712" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
@@ -99,6 +102,12 @@
       <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\resources\wikidata_queries\working" />
       <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\resources" />
       <recent name="C:\Users\Hugo\IdeaProjects\RDF-differential-privacy-improved\resources\wikidata_queries" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="memoria.hugosepulvedaa.utils" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="memoria.hugosepulvedaa" />
@@ -393,7 +402,14 @@
       <option name="project" value="LOCAL" />
       <updated>1641959184399</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="Minor changes: Regex to simplify polynomial expression.">
+      <created>1642029405083</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1642029405083</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -433,7 +449,8 @@
     <MESSAGE value="Dependencies fixed." />
     <MESSAGE value="Fixed: can change epsilon." />
     <MESSAGE value="Minor changes: unnecessary comments deleted." />
-    <option name="LAST_COMMIT_MESSAGE" value="Minor changes: unnecessary comments deleted." />
+    <MESSAGE value="Minor changes: Regex to simplify polynomial expression." />
+    <option name="LAST_COMMIT_MESSAGE" value="Minor changes: Regex to simplify polynomial expression." />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

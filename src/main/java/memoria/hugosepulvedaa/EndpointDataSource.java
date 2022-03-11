@@ -282,7 +282,7 @@ public class EndpointDataSource implements DataSource {
                         + " "
                         + "ORDER BY ?"
                         + variableName
-                        + " DESC (?count) LIMIT 1 ";
+                        + " DESC (?count) LIMIT 1";
 
         logger.info("query at getMostFrequentResult: " + maxFreqQueryString);
 
